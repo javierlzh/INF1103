@@ -15,5 +15,8 @@ while inventory < 500:
             failed_entries += 1
             continue
     inventory += quantity
+    if inventory > 500:
+            print("Inventory limit exceeded. Current inventory: ", inventory)
+            break
 
 
