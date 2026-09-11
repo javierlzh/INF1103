@@ -14,4 +14,6 @@ while inventory < 500:
             print("Invalid input. Quantity cannot be negative.")
             failed_entries += 1
             continue
+    inventory += quantity
+
 
