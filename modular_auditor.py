@@ -13,7 +13,6 @@ def get_valid_input():
            else:
                print("Invalid input. Please enter a valid number.")
                invalid_count += 1
-        
 
 def process_delivery(current_total, new_value):
         new_total = current_total + new_value
@@ -28,7 +27,6 @@ def generate_report(total_units, failed_attempts):
         print("-------------------")
         print("Total units processed: ", total_units)
         print("Number of Failed/Rejected Entries: ", failed_attempts)
-       
 
 def main():
         inventory = 0;
