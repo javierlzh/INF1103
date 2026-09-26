@@ -50,6 +50,10 @@ def load_inventory():
             print("Error: Inventory file is corrupted. Starting with 0 inventory.")
             return 0, []
 
+def save_inventory(inventory, transaction_history):
+        with open(INVENTORY_FILE, 'w') as file:
+            file.write(str(inventory) + "\n")
+            file.write(",".join(str(t) for t in transaction_history))
 
 def main():
         inventory, transaction_history = load_inventory()
