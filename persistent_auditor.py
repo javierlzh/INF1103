@@ -23,8 +23,7 @@ def process_delivery(current_total, new_value):
         return new_total
 
 def calculate_tax(amount):
-        tax_rate = 0.1  # Example tax rate of 10%
-        tax_amount = amount * tax_rate
+        tax_amount = amount * TAX_RATE
         return tax_amount
 
 def generate_report(total_units, failed_attempts):
@@ -57,16 +56,17 @@ def save_inventory(inventory, transaction_history):
 
 def main():
         inventory, transaction_history = load_inventory()
+        tax_amount = 0
         total_units = 0
         failed_entries = 0
         exit_program = False
 
-        while True:
+        while not exit_program:
               stock_quantity, invalid_count = get_valid_input()
               failed_entries += invalid_count
 
               if stock_quantity == 'quit':
-                break
+                exit_program = True
               elif inventory + stock_quantity > MAX_CAPACITY:
                     print(f"Delivery rejected: adding {stock_quantity} would exceed max capacity of {MAX_CAPACITY}. Current inventory: {inventory}")
                     failed_entries += 1
@@ -74,6 +74,7 @@ def main():
                     inventory = process_delivery(inventory, stock_quantity)
                     transaction_history.append(stock_quantity)
                     tax = calculate_tax(stock_quantity)
+                    tax_amount += tax
                     total_units += 1
                     print(f"Delivery of {stock_quantity} accepted. Tax: {tax}. New inventory total: {inventory}")
 
