@@ -3,7 +3,7 @@ INF1103 Week 5 - Inventory Manager
 """
 import json
 # Global Constant
-INVENTORY_FILE = "inventory.json"
+INVENTORY_FILE = "data/inventory.json"
 
 
 # ---------------------------------------------------------------
