@@ -1,3 +1,12 @@
+"""
+INF1103 Week 8 - Inventory Manager (OOP)
+"""
+
+import json
+import math
+
+INVENTORY_FILE = "inventory.json"
+
 # ---------------------------------------------------------------
 # Product class: stores and manages one product
 # ---------------------------------------------------------------
@@ -216,3 +225,55 @@ def ui_search_product(inventory):
     print(f"Price: ${product.price:.2f}")
     print(f"Stock: {product.stock}")
     print("-" * 48)
+
+
+def main():
+    exit_program = False
+    print("=" * 44)
+    print("INVENTORY MANAGEMENT SYSTEM")
+    print("=" * 44)
+    
+    inventory, status = load_inventory()
+    if status == "loaded":
+        print(f"\n{INVENTORY_FILE} found.")
+        print("Inventory loaded successfully.")
+    elif status == "not_found":
+        print(f"\n{INVENTORY_FILE} not found. Starting with empty inventory.")
+    elif status == "duplicates":
+        print(f"\n{INVENTORY_FILE} found.")
+        print("Inventory loaded, but duplicate product IDs were skipped.")
+    else:
+        print(f"\nError reading {INVENTORY_FILE}. Starting with empty inventory.")
+    
+    print_menu()
+    while not exit_program:
+        option = input("\nEnter option: ").strip()
+    
+        if option == "1":
+            inventory.display_all()
+        elif option == "2":
+            ui_add_product(inventory)
+        elif option == "3":
+            ui_update_stock(inventory)
+        elif option == "4":
+            ui_search_product(inventory)
+        elif option == "5":
+            print("\nSaving inventory...")
+            if save_inventory(inventory):
+                print(f"Inventory saved successfully to {INVENTORY_FILE}.")
+            else:
+                print("Failed to save inventory.")
+        elif option == "6":
+            print("\nSaving inventory before exit...")
+            if save_inventory(inventory):
+                print("Inventory saved successfully.")
+            else:
+                print("Failed to save inventory.")
+            print("\nThank you for using Inventory Management System.")
+            print("Program terminated.")
+            exit_program = True
+        else:
+            print("\nInvalid option. Please enter 1-6.")
+
+if __name__ == "__main__":
+    main()
