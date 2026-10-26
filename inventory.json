@@ -20,7 +20,7 @@
     {
         "id": "P004",
         "name": "Monitor",
-        "price": 299.99,
+        "price": 300.0,
         "stock": 10
     }
 ]
