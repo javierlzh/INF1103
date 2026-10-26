@@ -80,3 +80,139 @@ class Inventory:
         if product is None:
             return False
         return product.update_stock(new_stock)
+
+def save_inventory(inventory):
+    try:
+        with open(INVENTORY_FILE, "w") as file:
+            json.dump(inventory.to_list(), file, indent=4)
+        return True
+    except OSError:
+        return False
+
+def is_valid_item(item):
+    if not isinstance(item, dict):
+        return False
+    for key in ("id", "name", "price", "stock"):
+        if key not in item:
+            return False
+    return (isinstance(item["id"], str) and item["id"].strip() != ""
+            and isinstance(item["name"], str) 
+            and isinstance(item["price"], (int, float)) and item["price"] >= 0
+            and isinstance(item["stock"], int) and item["stock"] >= 0)
+
+def load_inventory():
+    inventory = Inventory()
+    status = "loaded"
+    try:
+        with open(INVENTORY_FILE, "r") as file:
+            data = json.load(file)                    # a list of dicts
+        if not isinstance(data, list):
+            raise ValueError("Top level of the file must be a list.")
+        for item in data:
+            if not is_valid_item(item):
+                raise ValueError("Invalid product entry.")
+            product = Product(item["id"], item["name"], item["price"], item["stock"])
+            if not inventory.add_product(product):
+                status = "duplicates"
+    except FileNotFoundError:
+        status = "not_found"
+    except (OSError, ValueError):
+        inventory = Inventory()
+        status = "error"
+    return inventory, status
+
+def print_menu():
+    print("\n----------- MENU -----------")
+    print("1. Display All Products")
+    print("2. Add Product")
+    print("3. Update Stock")
+    print("4. Search Product")
+    print("5. Save Inventory")
+    print("6. Exit")
+    print("----------------------------")
+
+def read_number(prompt, number_type=float):
+    """Prompt until a non-negative number of number_type (int or float) is entered."""
+    while True:
+        try:
+            value = number_type(input(prompt))
+            if not math.isfinite(value) or value < 0:
+                print("Value cannot be negative or infinite. Try again.")
+            else:
+                return value
+        except ValueError:
+            print(f"Invalid input. Please enter a valid {number_type.__name__}.")
+
+def ui_add_product(inventory):
+    print("\nAdd New Product")
+    while True:
+        product_id = input("Product ID (or 'q' to go back): ").strip()
+
+        if product_id.lower() == "q":
+            return  # back to the menu
+        elif product_id == "":
+            print("\nProduct ID cannot be empty.\n")
+        elif inventory.search_product(product_id) is not None:
+            print("\nProduct ID already exists.\n")
+        else:
+            break
+
+    name = input("Product Name: ").strip()
+    price = read_number("Price: ", float)
+    stock = read_number("Stock Quantity: ", int)
+
+    if inventory.add_product(Product(product_id, name, price, stock)):
+        print("\nProduct added successfully!")
+    else:
+        print("\nFailed to add product.")
+
+def ui_update_stock(inventory):
+    print("\nUpdate Stock")
+
+    # Keep asking until a valid ID is entered or the user quits
+    while True:
+        product_id = input("Enter Product ID (or 'q' to go back): ").strip()
+
+        if product_id.lower() == "q":
+            return  # back to the menu
+
+        product = inventory.search_product(product_id)
+        if product is None:
+            print("\nProduct not found.\n")
+        else:
+            break
+
+    print("\nProduct Found:")
+    print(f"Name: {product.name}")
+    print(f"Current Stock: {product.stock}")
+
+    new_stock = read_number("\nNew Stock Quantity: ", int)
+    if inventory.update_stock(product_id, new_stock):
+        print("\nStock updated successfully!")
+    else:
+        print("\nStock update failed.")
+
+
+def ui_search_product(inventory):
+    print("\nSearch Product")
+
+    # Keep asking until a valid ID is entered or the user quits
+    while True:
+        product_id = input("Enter Product ID (or 'q' to go back): ").strip()
+
+        if product_id.lower() == "q":
+            return  # back to the menu
+
+        product = inventory.search_product(product_id)
+        if product is None:
+            print("\nProduct not found.\n")
+        else:
+            break
+
+    print("\nProduct Found")
+    print("-" * 48)
+    print(f"ID: {product.product_id}")
+    print(f"Name: {product.name}")
+    print(f"Price: ${product.price:.2f}")
+    print(f"Stock: {product.stock}")
+    print("-" * 48)
