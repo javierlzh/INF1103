@@ -5,22 +5,17 @@ PhysicalProduct module containing physical inventory items.
 from product import Product
 from can_be_shipped import CanBeShipped
 
-
+@Product.register_product_type("physical")
 class PhysicalProduct(Product, CanBeShipped):
     """Represents a physical product that requires shipping and has weight."""
 
-    def __init__(self, product_id, name, price, stock, weight, shipping_rate=0.5):
+    def __init__(self, product_id, name, price, stock, weight):
         super().__init__(product_id, name, price, stock)
         self.__weight = weight
-        self.__shipping_rate = shipping_rate
 
     @property
     def weight(self):
         return self.__weight
-
-    @property
-    def shipping_rate(self):
-        return self.__shipping_rate
 
     def display_information(self):
         product_info = super().display_information()
@@ -30,12 +25,22 @@ class PhysicalProduct(Product, CanBeShipped):
         return f"Physical product. Shipping required. Weight: {self.weight}kg"
 
     def calculate_shipping_cost(self):
-        # Uses a dynamic instance attribute instead of a hardcoded magic number
-        return self.weight * self.shipping_rate
+        return self.weight * 0.5
 
     def to_dict(self):
         data = super().to_dict()
         data["type"] = "physical"
         data["weight"] = self.weight
-        data["shipping_rate"] = self.shipping_rate
         return data
+
+    @classmethod
+    def from_dict(cls, item):
+        return cls(
+            item["id"], item["name"], item["price"],
+            item["stock"], item["weight"]
+        )
+
+    @classmethod
+    def get_ui_inputs(cls, product_id, name, price, stock, read_number_func):
+        weight = read_number_func("Weight (kg): ", float)
+        return cls(product_id, name, price, stock, weight)

@@ -1,10 +1,11 @@
 """
-UI module handling console menus, prompts, and user inputs.
+UI module handling console menus, prompts, and user inputs dynamically.
 """
 
 import math
-from physical_product import PhysicalProduct
-from digital_product import DigitalProduct
+from product import Product
+# Import subscription_product so it registers itself with the Product registry
+import subscription_product
 
 
 def print_menu():
@@ -33,16 +34,20 @@ def read_number(prompt, number_type=float):
 
 
 def ui_add_product(inventory):
-    """Interactive UI flow to add a new product to the inventory."""
+    """Interactive UI flow to add any registered product to the inventory polymorphically."""
     print("\nAdd New Product")
 
+    # Dynamically fetch available product types from our registry (e.g., physical, digital, subscription)
+    valid_types = list(Product._registry.keys())
+    type_prompt = f"Product Type ({'/'.join(valid_types)}) (or 'q' to go back): "
+
     while True:
-        product_type = input("Product Type (physical/digital) (or 'q' to go back): ").strip().lower()
+        product_type = input(type_prompt).strip().lower()
         if product_type == "q":
             return
-        elif product_type in ("physical", "digital"):
+        elif product_type in valid_types:
             break
-        print("\nInvalid product type. Please enter 'physical' or 'digital'.\n")
+        print(f"\nInvalid product type. Please enter one of: {', '.join(valid_types)}.\n")
 
     while True:
         product_id = input("Product ID (or 'q' to go back): ").strip()
@@ -63,12 +68,9 @@ def ui_add_product(inventory):
     price = read_number("Price: ", float)
     stock = read_number("Stock Quantity: ", int)
 
-    if product_type == "physical":
-        weight = read_number("Weight (kg): ", float)
-        product = PhysicalProduct(product_id, name, price, stock, weight)
-    else:
-        download_size = read_number("Download Size (MB): ", float)
-        product = DigitalProduct(product_id, name, price, stock, download_size)
+    # Polymorphic creation! Instead of giant if/else chains, we call the class's own UI input method.
+    product_class = Product._registry[product_type]
+    product = product_class.get_ui_inputs(product_id, name, price, stock, read_number)
 
     if inventory.add_product(product):
         print("\nProduct added successfully!")

@@ -3,32 +3,40 @@
         "id": "P001",
         "name": "Laptop",
         "price": 1200.0,
-        "stock": 15,
+        "stock": 10,
         "type": "physical",
-        "weight": 5
+        "weight": 5.0
     },
     {
         "id": "P002",
         "name": "Mouse",
-        "price": 25.5,
-        "stock": 50,
+        "price": 15.99,
+        "stock": 20,
         "type": "digital",
-        "download_size": 50
+        "download_size": 20.0
     },
     {
         "id": "P003",
-        "name": "Keyboard",
-        "price": 45.0,
-        "stock": 25,
+        "name": "Mouse",
+        "price": 20.0,
+        "stock": 20,
         "type": "physical",
-        "weight": 1
+        "weight": 1.0
     },
     {
         "id": "P004",
-        "name": "Headphones",
-        "price": 99.99,
-        "stock": 5,
-        "type": "physical",
-        "weight": 2.0
+        "name": "File",
+        "price": 20.99,
+        "stock": 50,
+        "type": "digital",
+        "download_size": 10.0
+    },
+    {
+        "id": "P005",
+        "name": "Netflix",
+        "price": 29.99,
+        "stock": 1,
+        "type": "subscription",
+        "billing_cycle": "Monthly"
     }
 ]

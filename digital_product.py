@@ -5,6 +5,7 @@ DigitalProduct module containing downloadable items.
 from product import Product
 
 
+@Product.register_product_type("digital")
 class DigitalProduct(Product):
     """Represents a digital product that has a download size and no physical shipping."""
 
@@ -28,3 +29,17 @@ class DigitalProduct(Product):
         data["type"] = "digital"
         data["download_size"] = self.download_size
         return data
+
+    @classmethod
+    def from_dict(cls, item):
+        """Instantiate a DigitalProduct from a dictionary."""
+        return cls(
+            item["id"], item["name"], item["price"],
+            item["stock"], item["download_size"]
+        )
+
+    @classmethod
+    def get_ui_inputs(cls, product_id, name, price, stock, read_number_func):
+        """Prompt user for digital-specific inputs and return a DigitalProduct instance."""
+        download_size = read_number_func("Download Size (MB): ", float)
+        return cls(product_id, name, price, stock, download_size)
