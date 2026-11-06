@@ -4,6 +4,8 @@ Product module containing the abstract base class Product and the Product Regist
 
 from abc import ABC, abstractmethod
 
+from supplier import Supplier
+
 class Product(ABC):
     """Abstract base class representing a generic product in inventory."""
     
@@ -26,47 +28,47 @@ class Product(ABC):
             raise ValueError(f"Unknown product type: {product_type}")
         return cls._registry[product_type].from_dict(item)
 
-    def __init__(self, product_id, name, price, stock):
+    def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier = None):
         self.__product_id = product_id
         self.__name = name
         self.__price = price
         self.__stock = stock
+        self.__supplier: Supplier = supplier  # Optional association with a Supplier
 
-    @property
-    def product_id(self):
+    def get_product_id(self):
         return self.__product_id
 
-    @property
-    def name(self):
+    def get_name(self):
         return self.__name
 
-    @property
-    def price(self):
+    def get_price(self):
         return self.__price
 
-    @property
-    def stock(self):
+    def get_stock(self):
         return self.__stock
 
+    def get_supplier(self):
+        return self.__supplier
+
     def display_information(self):
-        return f"ID: {self.product_id} | Name: {self.name} | Price: ${self.price:.2f} | Stock: {self.stock}"
+        return f"ID: {self.get_product_id()} | Name: {self.get_name()} | Price: ${self.get_price():.2f} | Stock: {self.get_stock()}"
 
     def to_dict(self):
         return {
-            "id": self.product_id,
-            "name": self.name,
-            "price": self.price,
-            "stock": self.stock
+            "id": self.get_product_id(),
+            "name": self.get_name(),
+            "price": self.get_price(),
+            "stock": self.get_stock()
         }
 
-    def update_stock(self, new_stock):
+    def update_stock(self, new_stock: int):
         if new_stock < 0:
             return False
         self.__stock = new_stock
         return True
 
     @abstractmethod
-    def get_fulfilment_info(self):
+    def get_fulfilment_info(self: str):
         pass
 
     @classmethod

@@ -4,13 +4,14 @@ PhysicalProduct module containing physical inventory items.
 
 from product import Product
 from can_be_shipped import CanBeShipped
+from supplier import Supplier
 
 @Product.register_product_type("physical")
 class PhysicalProduct(Product, CanBeShipped):
     """Represents a physical product that requires shipping and has weight."""
 
-    def __init__(self, product_id, name, price, stock, weight):
-        super().__init__(product_id, name, price, stock)
+    def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float, supplier: Supplier = None):
+        super().__init__(product_id, name, price, stock, supplier)
         self.__weight = weight
 
     @property
