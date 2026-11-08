@@ -2,7 +2,7 @@
 SubscriptionProduct module.
 """
 
-from typing import Any, Callable
+from model_types import ProductData, ReadNumber
 
 from product import Product
 from supplier import Supplier
@@ -25,20 +25,22 @@ class SubscriptionProduct(Product):
     def get_fulfilment_info(self) -> str:
         return f"Subscription product. No physical fulfillment. Billing cycle: {self.get_billing_cycle()}"
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> ProductData:
         data = super().to_dict()
         data["type"] = "subscription"
         data["billing_cycle"] = self.get_billing_cycle()
         return data
 
     @classmethod
-    def from_dict(cls, item: dict[str, Any], supplier: Supplier) -> 'SubscriptionProduct':
+    def from_dict(cls, item: ProductData, supplier: Supplier) -> 'SubscriptionProduct':
+        if "billing_cycle" not in item:
+            raise ValueError("Subscription product requires billing cycle.")
         return cls(
             item["id"], item["name"], item["price"],
             item["stock"], item["billing_cycle"], supplier
         )
 
     @classmethod
-    def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: Callable[..., int | float], supplier: Supplier) -> 'SubscriptionProduct':
+    def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: ReadNumber, supplier: Supplier) -> 'SubscriptionProduct':
         billing_cycle = input("Billing Cycle (e.g., Monthly/Yearly): ").strip()
         return cls(product_id, name, price, stock, billing_cycle, supplier)

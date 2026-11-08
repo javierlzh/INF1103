@@ -18,7 +18,7 @@ def main() -> None:
     for product in products:
         Inventory.show_product_details(product)
 
-        assert product.update_stock(20) is True
+        assert product.update_stock(20) is None
         assert product.get_stock() == 20
 
         print(f"Updated stock: {product.get_stock()}\n")

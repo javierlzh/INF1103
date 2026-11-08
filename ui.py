@@ -3,6 +3,7 @@ UI module handling console menus, prompts, and user inputs dynamically.
 """
 
 import math
+from typing import overload
 from product import Product
 from inventory import Inventory
 from supplier import Supplier
@@ -20,6 +21,14 @@ def print_menu() -> None:
     print("5. Save Inventory")
     print("6. Exit")
     print("----------------------------")
+
+
+@overload
+def read_number(prompt: str, number_type: type[int]) -> int: ...
+
+
+@overload
+def read_number(prompt: str, number_type: type[float] = float) -> float: ...
 
 
 def read_number(prompt: str, number_type: type[int] | type[float] = float) -> int | float:
@@ -55,7 +64,7 @@ def ui_add_product(inventory: Inventory) -> None:
         product_id = input("Product ID (or 'q' to go back): ").strip()
         if product_id.lower() == 'q':
             return
-        elif inventory.search_product(product_id) is not None:
+        elif inventory.find_product(product_id) is not None:
             print("\nProduct ID already exists.\n")
         elif product_id != "":
             break
@@ -72,13 +81,11 @@ def ui_add_product(inventory: Inventory) -> None:
 
     supplier_id = input("Supplier ID: ").strip()
     supplier: Supplier | None = None
-    for item in inventory.to_list():
-        existing_product = inventory.search_product(item["id"])
-        if existing_product is not None:
-            existing_supplier = existing_product.get_supplier()
-            if existing_supplier.get_supplier_id() == supplier_id:
-                supplier = existing_supplier
-                break
+    for existing_product in inventory.get_all_products():
+        existing_supplier = existing_product.get_supplier()
+        if existing_supplier.get_supplier_id() == supplier_id:
+            supplier = existing_supplier
+            break
     if supplier is None:
         supplier_name = input("Supplier name: ").strip()
         supplier_email = input("Supplier contact email: ").strip()
@@ -91,10 +98,12 @@ def ui_add_product(inventory: Inventory) -> None:
     product_class = Product._registry[product_type]
     product = product_class.get_ui_inputs(product_id, name, price, stock, read_number, supplier)
 
-    if inventory.add_product(product):
-        print("\nProduct added successfully!")
+    try:
+        inventory.add_product(product)
+    except ValueError as error:
+        print(f"\nFailed to add product: {error}")
     else:
-        print("\nFailed to add product.")
+        print("\nProduct added successfully!")
 
 
 def ui_update_stock(inventory: Inventory) -> None:
@@ -104,17 +113,19 @@ def ui_update_stock(inventory: Inventory) -> None:
         product_id = input("Enter Product ID (or 'q' to go back): ").strip()
         if product_id.lower() == "q":
             return
-        product = inventory.search_product(product_id)
+        product = inventory.find_product(product_id)
         if product is not None:
             break
         print("\nProduct not found.\n")
 
     print(f"\nProduct Found: {product.get_name()} (Current Stock: {product.get_stock()})")
     new_stock = read_number("\nNew Stock Quantity: ", int)
-    if inventory.update_stock(product_id, new_stock):
-        print("\nStock updated successfully!")
+    try:
+        inventory.update_stock(product_id, int(new_stock))
+    except (KeyError, ValueError) as error:
+        print(f"\nStock update failed: {error}")
     else:
-        print("\nStock update failed.")
+        print("\nStock updated successfully!")
 
 
 def ui_search_product(inventory: Inventory) -> None:
@@ -124,7 +135,7 @@ def ui_search_product(inventory: Inventory) -> None:
         product_id = input("Enter Product ID (or 'q' to go back): ").strip()
         if product_id.lower() == "q":
             return
-        product = inventory.search_product(product_id)
+        product = inventory.find_product(product_id)
         if product is not None:
             break
         print("\nProduct not found.\n")

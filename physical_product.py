@@ -2,8 +2,7 @@
 PhysicalProduct module containing physical inventory items.
 """
 
-from collections.abc import Callable
-from typing import Any
+from model_types import ProductData, ReadNumber
 
 from product import Product
 from can_be_shipped import CanBeShipped
@@ -30,20 +29,22 @@ class PhysicalProduct(Product, CanBeShipped):
     def calculate_shipping_cost(self) -> float:
         return self.get_weight() * 0.5
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> ProductData:
         data = super().to_dict()
         data["type"] = "physical"
         data["weight"] = self.get_weight()
         return data
 
     @classmethod
-    def from_dict(cls, item: dict[str, Any], supplier: Supplier) -> 'PhysicalProduct':
+    def from_dict(cls, item: ProductData, supplier: Supplier) -> 'PhysicalProduct':
+        if "weight" not in item:
+            raise ValueError("Physical product requires weight.")
         return cls(
             item["id"], item["name"], item["price"],
             item["stock"], item["weight"], supplier
         )
 
     @classmethod
-    def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: Callable[..., int | float], supplier: Supplier) -> 'PhysicalProduct':
+    def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: ReadNumber, supplier: Supplier) -> 'PhysicalProduct':
         weight = read_number_func("Weight (kg): ", float)
         return cls(product_id, name, price, stock, weight, supplier)

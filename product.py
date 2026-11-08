@@ -4,9 +4,13 @@ Product module containing the abstract base class Product and the Product Regist
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import Any
+from typing import TypeVar
+
+from model_types import ProductData, ReadNumber
 
 from supplier import Supplier
+
+_ProductType = TypeVar("_ProductType", bound="Product")
 
 class Product(ABC):
     """Abstract base class representing a generic product in inventory."""
@@ -15,18 +19,18 @@ class Product(ABC):
     _registry: dict[str, type["Product"]] = {}
 
     @classmethod
-    def register_product_type(cls, product_type: str) -> Callable[[type["Product"]], type["Product"]]:
+    def register_product_type(cls, product_type: str) -> Callable[[type[_ProductType]], type[_ProductType]]:
         """Decorator or method to register a subclass."""
-        def decorator(subclass: type["Product"]) -> type["Product"]:
+        def decorator(subclass: type[_ProductType]) -> type[_ProductType]:
             cls._registry[product_type] = subclass
             return subclass
         return decorator
 
     @classmethod
-    def create_from_dict(cls, item: dict[str, Any], suppliers: dict[str, Supplier] | None = None) -> 'Product':
+    def create_from_dict(cls, item: ProductData, suppliers: dict[str, Supplier] | None = None) -> 'Product':
         """Polymorphic factory: instantiates the correct subclass from a dict."""
         product_type = item.get("type")
-        if product_type not in cls._registry:
+        if product_type is None or product_type not in cls._registry:
             raise ValueError(f"Unknown product type: {product_type}")
         supplier_data = item.get("supplier")
         if not isinstance(supplier_data, dict):
@@ -67,7 +71,7 @@ class Product(ABC):
     def display_information(self) -> str:
         return f"ID: {self.get_product_id()} | Name: {self.get_name()} | Price: ${self.get_price():.2f} | Stock: {self.get_stock()}"
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> ProductData:
         return {
             "id": self.get_product_id(),
             "name": self.get_name(),
@@ -76,11 +80,11 @@ class Product(ABC):
             "supplier": self.get_supplier().to_dict()
         }
 
-    def update_stock(self, new_stock: int) -> bool:
-        if new_stock < 0:
-            return False
-        self.__stock = new_stock
-        return True
+    def update_stock(self, quantity: int) -> None:
+        """Set stock to quantity. Raise ValueError for negative stock."""
+        if quantity < 0:
+            raise ValueError("Stock cannot be negative.")
+        self.__stock = quantity
 
     @abstractmethod
     def get_fulfilment_info(self) -> str:
@@ -88,12 +92,12 @@ class Product(ABC):
 
     @classmethod
     @abstractmethod
-    def from_dict(cls, item: dict[str, Any], supplier: Supplier) -> 'Product':
+    def from_dict(cls, item: ProductData, supplier: Supplier) -> 'Product':
         """Each product knows how to build itself from dictionary data."""
         pass
 
     @classmethod
     @abstractmethod
-    def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: Callable[..., int | float], supplier: Supplier) -> 'Product':
+    def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: ReadNumber, supplier: Supplier) -> 'Product':
         """Each product knows what specific UI prompts it needs."""
         pass

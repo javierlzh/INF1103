@@ -1,3 +1,6 @@
+from model_types import SupplierData
+
+
 class Supplier:
     def __init__(self, supplier_id: str, name: str, contact_email: str) -> None:
         self.__supplier_id: str = supplier_id
@@ -15,7 +18,7 @@ class Supplier:
 
     def display_information(self) -> None:
         print(f"Supplier ID: {self.__supplier_id} | Name: {self.__name} | Contact Email: {self.__contact_email}")
-    def to_dict(self) -> dict[str, str]:
+    def to_dict(self) -> SupplierData:
         return {
             "supplier_id": self.__supplier_id,
             "name": self.__name,
@@ -23,8 +26,9 @@ class Supplier:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, str]) -> "Supplier":
-        fields = ("supplier_id", "name", "contact_email")
-        if any(not isinstance(data.get(field), str) or not data[field].strip() for field in fields):
+    def from_dict(cls, data: SupplierData) -> "Supplier":
+        if any(not isinstance(value, str) or not value.strip() for value in (
+            data.get("supplier_id"), data.get("name"), data.get("contact_email")
+        )):
             raise ValueError("Supplier requires an ID, name, and contact email.")
         return cls(data["supplier_id"], data["name"], data["contact_email"])
