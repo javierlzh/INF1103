@@ -1,6 +1,6 @@
-from model_types import ProductData, ReadNumber
-
 from product import Product
+from product_data import ProductData
+from read_number import ReadNumber
 from supplier import Supplier
 
 @Product.register_product_type("subscription")

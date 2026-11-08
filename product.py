@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import TypeVar
 
-from model_types import ProductData, ReadNumber
-
+from product_data import ProductData
+from read_number import ReadNumber
 from supplier import Supplier
 
 _ProductType = TypeVar("_ProductType", bound="Product")

@@ -1,4 +1,16 @@
-from model_types import SupplierData
+from typing import TypeGuard
+
+from supplier_data import SupplierData
+
+
+def is_supplier_data(value: object) -> TypeGuard[SupplierData]:
+    """Check untrusted JSON before treating it as a supplier record."""
+    if not isinstance(value, dict):
+        return False
+    return all(
+        isinstance(value.get(key), str) and bool(value[key].strip())
+        for key in ("supplier_id", "name", "contact_email")
+    )
 
 
 class Supplier:

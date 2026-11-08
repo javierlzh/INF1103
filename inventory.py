@@ -1,5 +1,5 @@
-from model_types import ProductData
 from product import Product
+from product_data import ProductData
 
 
 class Inventory:
