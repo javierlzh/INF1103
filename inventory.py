@@ -55,3 +55,12 @@ class Inventory:
             return False
         self.__inventory.remove(product)
         return True
+
+    @staticmethod
+    def show_product_details(product: Product) -> None:
+        """Display detailed information about a specific product."""
+        print("\nProduct Details")
+        print("-" * 48)
+        print(product.display_information())
+        print(product.get_fulfilment_info())
+        print("-" * 48)

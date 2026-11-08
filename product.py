@@ -23,19 +23,31 @@ class Product(ABC):
         return decorator
 
     @classmethod
-    def create_from_dict(cls, item: dict[str, Any]) -> 'Product':
+    def create_from_dict(cls, item: dict[str, Any], suppliers: dict[str, Supplier] | None = None) -> 'Product':
         """Polymorphic factory: instantiates the correct subclass from a dict."""
         product_type = item.get("type")
         if product_type not in cls._registry:
             raise ValueError(f"Unknown product type: {product_type}")
-        return cls._registry[product_type].from_dict(item)
+        supplier_data = item.get("supplier")
+        if not isinstance(supplier_data, dict):
+            raise ValueError(f"Product {item.get('id')} needs supplier details.")
+        supplier = Supplier.from_dict(supplier_data)
+        if suppliers is not None:
+            supplier_id = supplier.get_supplier_id()
+            if supplier_id in suppliers:
+                if suppliers[supplier_id].to_dict() != supplier.to_dict():
+                    raise ValueError(f"Conflicting details for supplier {supplier_id}.")
+                supplier = suppliers[supplier_id]
+            else:
+                suppliers[supplier_id] = supplier
+        return cls._registry[product_type].from_dict(item, supplier)
 
-    def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier | None = None) -> None:
+    def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier) -> None:
         self.__product_id: str = product_id
         self.__name: str = name
         self.__price: float = price
         self.__stock: int = stock
-        self.__supplier: Supplier = supplier  # Optional association with a Supplier
+        self.__supplier: Supplier = supplier
 
     def get_product_id(self) -> str:
         return self.__product_id
@@ -55,12 +67,13 @@ class Product(ABC):
     def display_information(self) -> str:
         return f"ID: {self.get_product_id()} | Name: {self.get_name()} | Price: ${self.get_price():.2f} | Stock: {self.get_stock()}"
 
-    def to_dict(self) -> dict[str, str | float | int]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.get_product_id(),
             "name": self.get_name(),
             "price": self.get_price(),
-            "stock": self.get_stock()
+            "stock": self.get_stock(),
+            "supplier": self.get_supplier().to_dict()
         }
 
     def update_stock(self, new_stock: int) -> bool:
@@ -75,12 +88,12 @@ class Product(ABC):
 
     @classmethod
     @abstractmethod
-    def from_dict(cls, item: dict[str, Any]) -> 'Product':
+    def from_dict(cls, item: dict[str, Any], supplier: Supplier) -> 'Product':
         """Each product knows how to build itself from dictionary data."""
         pass
 
     @classmethod
     @abstractmethod
-    def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: Callable[..., int | float]) -> 'Product':
+    def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: Callable[..., int | float], supplier: Supplier) -> 'Product':
         """Each product knows what specific UI prompts it needs."""
         pass

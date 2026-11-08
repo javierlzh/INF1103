@@ -2,11 +2,9 @@
 DigitalProduct module containing downloadable items.
 """
 
-from collections.abc import Callable
-from typing import Any
-
 from product import Product
 from supplier import Supplier
+import typing
 
 
 @Product.register_product_type("digital")
@@ -27,22 +25,22 @@ class DigitalProduct(Product):
     def get_fulfilment_info(self) -> str:
         return f"Digital product. No shipping required. Download Size: {self.get_download_size()}MB"
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> dict[str, str | float | int]:
         data = super().to_dict()
         data["type"] = "digital"
         data["download_size"] = self.get_download_size()
         return data
 
     @classmethod
-    def from_dict(cls, item: dict[str, Any], supplier: Supplier) -> 'DigitalProduct':
+    def from_dict(cls, item: dict[str, typing.Any]):
         """Instantiate a DigitalProduct from a dictionary."""
         return cls(
             item["id"], item["name"], item["price"],
-            item["stock"], item["download_size"], supplier
+            item["stock"], item["download_size"], item.get("supplier")
         )
 
     @classmethod
-    def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: Callable[..., int | float], supplier: Supplier) -> 'DigitalProduct':
+    def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: typing.Callable[..., float]) -> 'DigitalProduct':
         """Prompt user for digital-specific inputs and return a DigitalProduct instance."""
         download_size = read_number_func("Download Size (MB): ", float)
-        return cls(product_id, name, price, stock, download_size, supplier)
+        return cls(product_id, name, price, stock, download_size)

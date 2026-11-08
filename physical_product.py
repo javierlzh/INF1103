@@ -2,7 +2,8 @@
 PhysicalProduct module containing physical inventory items.
 """
 
-from collections.abc import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from product import Product
 from can_be_shipped import CanBeShipped
@@ -12,7 +13,7 @@ from supplier import Supplier
 class PhysicalProduct(Product, CanBeShipped):
     """Represents a physical product that requires shipping and has weight."""
 
-    def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float, supplier: Supplier | None = None) -> None:
+    def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float, supplier: Supplier) -> None:
         super().__init__(product_id, name, price, stock, supplier)
         self.__weight: float = weight
 
@@ -29,20 +30,20 @@ class PhysicalProduct(Product, CanBeShipped):
     def calculate_shipping_cost(self) -> float:
         return self.get_weight() * 0.5
 
-    def to_dict(self) -> dict[str, str | float | int]:
+    def to_dict(self) -> dict[str, Any]:
         data = super().to_dict()
         data["type"] = "physical"
         data["weight"] = self.get_weight()
         return data
 
     @classmethod
-    def from_dict(cls, item: dict[str, Any]) -> 'PhysicalProduct':
+    def from_dict(cls, item: dict[str, Any], supplier: Supplier) -> 'PhysicalProduct':
         return cls(
             item["id"], item["name"], item["price"],
-            item["stock"], item["weight"], item.get("supplier")
+            item["stock"], item["weight"], supplier
         )
 
     @classmethod
-    def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: Callable[..., int | float]) -> 'PhysicalProduct':
+    def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: Callable[..., int | float], supplier: Supplier) -> 'PhysicalProduct':
         weight = read_number_func("Weight (kg): ", float)
-        return cls(product_id, name, price, stock, weight)
+        return cls(product_id, name, price, stock, weight, supplier)

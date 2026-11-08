@@ -5,9 +5,11 @@ Persistence module handling JSON file loading, saving, and validation dynamicall
 import json
 from inventory import Inventory
 from product import Product
+from supplier import Supplier
 # Make sure to import all product modules so their decorators execute!
 import physical_product
 import digital_product
+import subscription_product
 
 INVENTORY_FILE: str = "inventory.json"
 
@@ -31,6 +33,7 @@ def is_valid_item(item: object) -> bool:
 def load_inventory() -> tuple[Inventory, str]:
     inventory = Inventory()
     status = "loaded"
+    suppliers: dict[str, Supplier] = {}
     try:
         with open(INVENTORY_FILE, "r", encoding="utf-8") as file:
             data = json.load(file)
@@ -40,7 +43,7 @@ def load_inventory() -> tuple[Inventory, str]:
             if not is_valid_item(item):
                 raise ValueError("Invalid product entry.")
             # Polymorphic creation handles any registered product type automatically!
-            product = Product.create_from_dict(item)
+            product = Product.create_from_dict(item, suppliers)
             if not inventory.add_product(product):
                 status = "duplicates"
     except FileNotFoundError:
