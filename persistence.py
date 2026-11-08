@@ -8,10 +8,6 @@ from model_types import ProductData, is_product_data
 from inventory import Inventory
 from product import Product
 from supplier import Supplier
-# Make sure to import all product modules so their decorators execute!
-import physical_product
-import digital_product
-import subscription_product
 
 INVENTORY_FILE: str = "inventory.json"
 
@@ -39,7 +35,6 @@ def load_inventory() -> tuple[Inventory, str]:
         for item in data:
             if not is_valid_item(item):
                 raise ValueError("Invalid product entry.")
-            # Polymorphic creation handles any registered product type automatically!
             product = Product.create_from_dict(item, suppliers)
             if inventory.find_product(product.get_product_id()) is not None:
                 status = "duplicates"
@@ -48,7 +43,7 @@ def load_inventory() -> tuple[Inventory, str]:
     except FileNotFoundError:
         status = "not_found"
     except (OSError, ValueError) as e:
-        print(f"DEBUG ERROR: {e}")  # <-- Add this line temporarily
+        print(f"DEBUG ERROR: {e}")
         inventory = Inventory()
         status = "error"
     return inventory, status

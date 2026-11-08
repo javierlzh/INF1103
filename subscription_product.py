@@ -1,7 +1,3 @@
-"""
-SubscriptionProduct module.
-"""
-
 from model_types import ProductData, ReadNumber
 
 from product import Product

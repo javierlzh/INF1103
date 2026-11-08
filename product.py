@@ -1,7 +1,3 @@
-"""
-Product module containing the abstract base class Product and the Product Registry.
-"""
-
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import TypeVar

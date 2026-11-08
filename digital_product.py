@@ -1,7 +1,3 @@
-"""
-DigitalProduct module containing downloadable items.
-"""
-
 from product import Product
 from supplier import Supplier
 from model_types import ProductData, ReadNumber

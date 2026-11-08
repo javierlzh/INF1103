@@ -1,7 +1,3 @@
-"""
-Main application runner module.
-"""
-
 from persistence import load_inventory, save_inventory, INVENTORY_FILE
 from ui import print_menu, ui_add_product, ui_update_stock, ui_search_product
 

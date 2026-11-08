@@ -1,7 +1,3 @@
-"""
-Inventory module to manage collections of products.
-"""
-
 from model_types import ProductData
 from product import Product
 

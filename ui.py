@@ -1,15 +1,8 @@
-"""
-UI module handling console menus, prompts, and user inputs dynamically.
-"""
-
 import math
 from typing import overload
 from product import Product
 from inventory import Inventory
 from supplier import Supplier
-# Import subscription_product so it registers itself with the Product registry
-import subscription_product
-
 
 def print_menu() -> None:
     """Display the main application menu."""
@@ -94,7 +87,6 @@ def ui_add_product(inventory: Inventory) -> None:
             return
         supplier = Supplier(supplier_id, supplier_name, supplier_email)
 
-    # Polymorphic creation! Instead of giant if/else chains, we call the class's own UI input method.
     product_class = Product._registry[product_type]
     product = product_class.get_ui_inputs(product_id, name, price, stock, read_number, supplier)
 

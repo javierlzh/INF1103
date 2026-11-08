@@ -1,7 +1,3 @@
-"""
-CanBeShipped interface module.
-"""
-
 from abc import ABC, abstractmethod
 
 

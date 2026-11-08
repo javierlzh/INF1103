@@ -1,7 +1,3 @@
-"""
-PhysicalProduct module containing physical inventory items.
-"""
-
 from model_types import ProductData, ReadNumber
 
 from product import Product
