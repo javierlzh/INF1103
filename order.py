@@ -4,7 +4,7 @@ from product import Product
 class Order:
     """Represents an order containing products and their quantities."""
     
-    def __init__(self, order_id: str):
+    def __init__(self, order_id: str) -> None:
         self.__order_id: str = order_id
         self.__order_lines: list[OrderLine] = []  # List to hold OrderLine instances
 

@@ -2,6 +2,8 @@
 PhysicalProduct module containing physical inventory items.
 """
 
+from collections.abc import Any, Callable
+
 from product import Product
 from can_be_shipped import CanBeShipped
 from supplier import Supplier
@@ -10,38 +12,37 @@ from supplier import Supplier
 class PhysicalProduct(Product, CanBeShipped):
     """Represents a physical product that requires shipping and has weight."""
 
-    def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float, supplier: Supplier = None):
+    def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float, supplier: Supplier | None = None) -> None:
         super().__init__(product_id, name, price, stock, supplier)
-        self.__weight = weight
+        self.__weight: float = weight
 
-    @property
-    def weight(self):
+    def get_weight(self) -> float:
         return self.__weight
 
-    def display_information(self):
+    def display_information(self) -> str:
         product_info = super().display_information()
-        return f"{product_info} | Weight: {self.weight}kg"
+        return f"{product_info} | Weight: {self.get_weight()}kg"
 
-    def get_fulfilment_info(self):
-        return f"Physical product. Shipping required. Weight: {self.weight}kg"
+    def get_fulfilment_info(self) -> str:
+        return f"Physical product. Shipping required. Weight: {self.get_weight()}kg"
 
-    def calculate_shipping_cost(self):
-        return self.weight * 0.5
+    def calculate_shipping_cost(self) -> float:
+        return self.get_weight() * 0.5
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, str | float | int]:
         data = super().to_dict()
         data["type"] = "physical"
-        data["weight"] = self.weight
+        data["weight"] = self.get_weight()
         return data
 
     @classmethod
-    def from_dict(cls, item):
+    def from_dict(cls, item: dict[str, Any]) -> 'PhysicalProduct':
         return cls(
             item["id"], item["name"], item["price"],
-            item["stock"], item["weight"]
+            item["stock"], item["weight"], item.get("supplier")
         )
 
     @classmethod
-    def get_ui_inputs(cls, product_id, name, price, stock, read_number_func):
+    def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: Callable[..., int | float]) -> 'PhysicalProduct':
         weight = read_number_func("Weight (kg): ", float)
         return cls(product_id, name, price, stock, weight)

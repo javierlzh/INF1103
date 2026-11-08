@@ -9,9 +9,9 @@ from product import Product
 import physical_product
 import digital_product
 
-INVENTORY_FILE = "inventory.json"
+INVENTORY_FILE: str = "inventory.json"
 
-def save_inventory(inventory):
+def save_inventory(inventory: Inventory) -> bool:
     try:
         with open(INVENTORY_FILE, "w", encoding="utf-8") as file:
             json.dump(inventory.to_list(), file, indent=4)
@@ -19,7 +19,7 @@ def save_inventory(inventory):
     except OSError:
         return False
 
-def is_valid_item(item):
+def is_valid_item(item: object) -> bool:
     """Generic structural validation (type checking can also be delegated if desired)."""
     if not isinstance(item, dict):
         return False
@@ -28,7 +28,7 @@ def is_valid_item(item):
             return False
     return item["type"] in Product._registry
 
-def load_inventory():
+def load_inventory() -> tuple[Inventory, str]:
     inventory = Inventory()
     status = "loaded"
     try:

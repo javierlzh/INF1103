@@ -3,7 +3,7 @@ from product import Product
 class OrderLine:
     """Represents a line item in an order, linking a product with a quantity."""
     
-    def __init__(self, product: Product, quantity: int):
+    def __init__(self, product: Product, quantity: int) -> None:
         self.__product: Product = product
         self.__quantity: int = quantity
 

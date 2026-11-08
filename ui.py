@@ -4,11 +4,13 @@ UI module handling console menus, prompts, and user inputs dynamically.
 
 import math
 from product import Product
+from inventory import Inventory
+from supplier import Supplier
 # Import subscription_product so it registers itself with the Product registry
 import subscription_product
 
 
-def print_menu():
+def print_menu() -> None:
     """Display the main application menu."""
     print("\n----------- MENU -----------")
     print("1. Display All Products")
@@ -20,7 +22,7 @@ def print_menu():
     print("----------------------------")
 
 
-def read_number(prompt, number_type=float):
+def read_number(prompt: str, number_type: type[int] | type[float] = float) -> int | float:
     """Prompt until a non-negative number of number_type is entered."""
     while True:
         try:
@@ -33,7 +35,7 @@ def read_number(prompt, number_type=float):
             print(f"Invalid input. Please enter a valid {number_type.__name__}.")
 
 
-def ui_add_product(inventory):
+def ui_add_product(inventory: Inventory) -> None:
     """Interactive UI flow to add any registered product to the inventory polymorphically."""
     print("\nAdd New Product")
 
@@ -68,9 +70,26 @@ def ui_add_product(inventory):
     price = read_number("Price: ", float)
     stock = read_number("Stock Quantity: ", int)
 
+    supplier_id = input("Supplier ID: ").strip()
+    supplier: Supplier | None = None
+    for item in inventory.to_list():
+        existing_product = inventory.search_product(item["id"])
+        if existing_product is not None:
+            existing_supplier = existing_product.get_supplier()
+            if existing_supplier.get_supplier_id() == supplier_id:
+                supplier = existing_supplier
+                break
+    if supplier is None:
+        supplier_name = input("Supplier name: ").strip()
+        supplier_email = input("Supplier contact email: ").strip()
+        if not all((supplier_id, supplier_name, supplier_email)):
+            print("Supplier details cannot be empty.")
+            return
+        supplier = Supplier(supplier_id, supplier_name, supplier_email)
+
     # Polymorphic creation! Instead of giant if/else chains, we call the class's own UI input method.
     product_class = Product._registry[product_type]
-    product = product_class.get_ui_inputs(product_id, name, price, stock, read_number)
+    product = product_class.get_ui_inputs(product_id, name, price, stock, read_number, supplier)
 
     if inventory.add_product(product):
         print("\nProduct added successfully!")
@@ -78,7 +97,7 @@ def ui_add_product(inventory):
         print("\nFailed to add product.")
 
 
-def ui_update_stock(inventory):
+def ui_update_stock(inventory: Inventory) -> None:
     """Interactive UI flow to update product stock."""
     print("\nUpdate Stock")
     while True:
@@ -90,7 +109,7 @@ def ui_update_stock(inventory):
             break
         print("\nProduct not found.\n")
 
-    print(f"\nProduct Found: {product.name} (Current Stock: {product.stock})")
+    print(f"\nProduct Found: {product.get_name()} (Current Stock: {product.get_stock()})")
     new_stock = read_number("\nNew Stock Quantity: ", int)
     if inventory.update_stock(product_id, new_stock):
         print("\nStock updated successfully!")
@@ -98,7 +117,7 @@ def ui_update_stock(inventory):
         print("\nStock update failed.")
 
 
-def ui_search_product(inventory):
+def ui_search_product(inventory: Inventory) -> None:
     """Interactive UI flow to search and display a product."""
     print("\nSearch Product")
     while True:

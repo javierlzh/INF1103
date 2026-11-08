@@ -1,17 +1,30 @@
 class Supplier:
-    def __init__(self, supplier_id: str, name: str, contact_email: str):
-        self.__supplier_id = supplier_id
-        self.__name = name
-        self.__contact_email = contact_email
+    def __init__(self, supplier_id: str, name: str, contact_email: str) -> None:
+        self.__supplier_id: str = supplier_id
+        self.__name: str = name
+        self.__contact_email: str = contact_email
 
-    def get_supplier_id(self):
+    def get_supplier_id(self) -> str:
         return self.__supplier_id
 
-    def get_name(self):
+    def get_name(self) -> str:
         return self.__name
 
-    def get_contact_email(self):
+    def get_contact_email(self) -> str:
         return self.__contact_email
 
-    def display_information(self):
+    def display_information(self) -> None:
         print(f"Supplier ID: {self.__supplier_id} | Name: {self.__name} | Contact Email: {self.__contact_email}")
+    def to_dict(self) -> dict[str, str]:
+        return {
+            "supplier_id": self.__supplier_id,
+            "name": self.__name,
+            "contact_email": self.__contact_email,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, str]) -> "Supplier":
+        fields = ("supplier_id", "name", "contact_email")
+        if any(not isinstance(data.get(field), str) or not data[field].strip() for field in fields):
+            raise ValueError("Supplier requires an ID, name, and contact email.")
+        return cls(data["supplier_id"], data["name"], data["contact_email"])

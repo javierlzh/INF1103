@@ -6,9 +6,9 @@ from persistence import load_inventory, save_inventory, INVENTORY_FILE
 from ui import print_menu, ui_add_product, ui_update_stock, ui_search_product
 
 
-def main():
+def main() -> None:
     """Main execution loop for the Inventory Management System."""
-    exit_program = False
+    exit_program: bool = False
     print("=" * 44)
     print("INVENTORY MANAGEMENT SYSTEM")
     print("=" * 44)
@@ -25,7 +25,7 @@ def main():
     
     print_menu()
     while not exit_program:
-        option = input("\nEnter option: ").strip()
+        option: str = input("\nEnter option: ").strip()
     
         if option == "1":
             inventory.display_all()
