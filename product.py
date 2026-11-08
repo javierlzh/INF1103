@@ -69,7 +69,14 @@ class Product(ABC):
         return self.__supplier
 
     def display_information(self) -> str:
-        return f"ID: {self.get_product_id()} | Name: {self.get_name()} | Price: ${self.get_price():.2f} | Stock: {self.get_stock()}"
+        supplier = self.get_supplier()
+        return (
+            f"ID: {self.get_product_id()} | Name: {self.get_name()} "
+            f"| Price: ${self.get_price():.2f} | Stock: {self.get_stock()} "
+            f"| Supplier ID: {supplier.get_supplier_id()} "
+            f"| Supplier: {supplier.get_name()} "
+            f"| Contact Email: {supplier.get_contact_email()}"
+        )
 
     def to_dict(self) -> ProductData:
         return {

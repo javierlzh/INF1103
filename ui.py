@@ -119,6 +119,7 @@ def ui_update_stock(inventory: Inventory) -> None:
         print("\nProduct not found.\n")
 
     print(f"\nProduct Found: {product.get_name()} (Current Stock: {product.get_stock()})")
+    product.get_supplier().display_information()
     new_stock = read_number("\nNew Stock Quantity: ", int)
     try:
         inventory.update_stock(product_id, int(new_stock))
