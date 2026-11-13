@@ -42,16 +42,11 @@ class PhysicalProduct(Product, CanBeShipped):
 
         if "weight" not in item:
             raise ValueError("Physical product requires weight.")
-        return cast(PhysicalProduct, ProductFactory.create(
-            "physical", item["id"], item["name"], item["price"], item["stock"],
-            supplier, weight=item["weight"],
-        ))
+        return cast(PhysicalProduct, ProductFactory.create('physical', item['id'], item['name'], item['price'], item['stock'], item['weight'], supplier))
 
     @classmethod
     def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: ReadNumber, supplier: Supplier) -> 'PhysicalProduct':
         from product_factory import ProductFactory
 
         weight = read_number_func("Weight (kg): ", float)
-        return cast(PhysicalProduct, ProductFactory.create(
-            "physical", product_id, name, price, stock, supplier, weight=weight,
-        ))
+        return cast(PhysicalProduct, ProductFactory.create('physical', product_id, name, price, stock, weight, supplier))

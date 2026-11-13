@@ -37,9 +37,8 @@ class SubscriptionProduct(Product):
 
         if "billing_cycle" not in item:
             raise ValueError("Subscription product requires billing cycle.")
-        return cast(SubscriptionProduct, ProductFactory.create(
-            "subscription", item["id"], item["name"], item["price"], item["stock"],
-            supplier, billing_cycle=item["billing_cycle"],
+        return cast(SubscriptionProduct, ProductFactory.create_subscription(
+            item['id'], item['name'], item['price'], item['stock'], item['billing_cycle'], supplier,
         ))
 
     @classmethod
@@ -47,7 +46,6 @@ class SubscriptionProduct(Product):
         from product_factory import ProductFactory
 
         billing_cycle = input("Billing Cycle (e.g., Monthly/Yearly): ").strip()
-        return cast(SubscriptionProduct, ProductFactory.create(
-            "subscription", product_id, name, price, stock, supplier,
-            billing_cycle=billing_cycle,
+        return cast(SubscriptionProduct, ProductFactory.create_subscription(
+            product_id, name, price, stock, billing_cycle, supplier,
         ))

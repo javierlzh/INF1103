@@ -10,12 +10,8 @@ from supplier import Supplier
 
 def main() -> None:
     supplier = Supplier("S001", "ABC Supplies", "abc@example.com")
-    book = ProductFactory.create(
-        "physical", "P001", "Book", 25.0, 10, supplier, weight=0.5
-    )
-    ebook = ProductFactory.create(
-        "digital", "D001", "Ebook", 15.0, 10, supplier, download_size=2.0
-    )
+    book = ProductFactory.create('physical', 'P001', 'Book', 25.0, 10, 0.5, supplier)
+    ebook = ProductFactory.create('digital', 'D001', 'Ebook', 15.0, 10, 2.0, supplier)
     order = Order("O001")
     order.add_order_line(book, 3)
     order.add_order_line(ebook, 3)

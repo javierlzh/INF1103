@@ -13,7 +13,7 @@ from supplier import Supplier
 class OrderStrategyTests(unittest.TestCase):
     def test_total_is_calculated_through_the_strategy(self) -> None:
         supplier = Supplier("S1", "Supplier", "s@example.com")
-        product = ProductFactory.create("physical", "P1", "Book", 10.0, 5, supplier, weight=0.5)
+        product = ProductFactory.create('physical', 'P1', 'Book', 10.0, 5, 0.5, supplier)
         strategy = Mock(spec=DiscountStrategy)
         strategy.apply.return_value = 23.0
         order = Order("O1", strategy)

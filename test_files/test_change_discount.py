@@ -12,7 +12,7 @@ from supplier import Supplier
 class ChangeDiscountTests(unittest.TestCase):
     def test_existing_order_can_change_strategy(self) -> None:
         supplier = Supplier("S1", "Supplier", "s@example.com")
-        product = ProductFactory.create("physical", "P1", "Book", 20.0, 10, supplier, weight=0.5)
+        product = ProductFactory.create('physical', 'P1', 'Book', 20.0, 10, 0.5, supplier)
         order = Order("O1")
         order.add_order_line(product, 5)
         original_lines = order.get_order_lines()
@@ -37,7 +37,7 @@ class ChangeDiscountTests(unittest.TestCase):
 
     def test_lab_example_switches_from_bulk_to_percentage(self) -> None:
         supplier = Supplier("S1", "Supplier", "s@example.com")
-        product = ProductFactory.create("physical", "P1", "Book", 50.0, 10, supplier, weight=0.5)
+        product = ProductFactory.create('physical', 'P1', 'Book', 50.0, 10, 0.5, supplier)
         order = Order("O1", BulkDiscount(200, 20))
         order.add_order_line(product, 5)
         self.assertEqual(order.calculate_total(), 230.0)

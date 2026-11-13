@@ -17,17 +17,15 @@ class OrderMenuTests(unittest.TestCase):
     def setUp(self) -> None:
         supplier = Supplier("S1", "Supplier", "s@example.com")
         self.inventory: Inventory = Inventory()
-        self.inventory.add_product(ProductFactory.create(
-            "physical", "P1", "Book", 20.0, 10, supplier, weight=0.5
-        ))
+        self.inventory.add_product(ProductFactory.create('physical', 'P1', 'Book', 20.0, 10, 0.5, supplier))
 
     def test_option_seven_creates_order_and_switches_discounts(self) -> None:
         answers = ["7", "O1", "P1", "5", "done", "1", "20", "2", "3", "100", "15", "", "q", "6"]
         output = io.StringIO()
-        with patch("main.load_inventory", return_value=(self.inventory, "loaded")):
-            with patch("main.save_inventory", return_value=True), patch("builtins.input", side_effect=answers):
+        with patch("main.FileHandling.load_inventory", return_value=(self.inventory, "loaded")):
+            with patch("main.FileHandling.save_inventory", return_value=True), patch("builtins.input", side_effect=answers):
                 with redirect_stdout(output):
-                    main.main()
+                    main.Main().run()
         for expected in ("Order total: $80.00", "Order total: $95.00", "Order total: $85.00", "Order total: $100.00", "Terminated."):
             self.assertIn(expected, output.getvalue())
 

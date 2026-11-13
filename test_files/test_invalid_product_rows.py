@@ -5,7 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from inventory import Inventory
-from load_products import load_products
+from test_files.csv_test_helper import load_products
 from supplier import Supplier
 
 

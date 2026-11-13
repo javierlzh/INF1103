@@ -1,10 +1,6 @@
 import math
 from typing import overload
-from product import Product
 from inventory import Inventory
-from supplier import Supplier
-from get_positive_float import get_positive_float
-from product_factory import ProductFactory
 from bulk_discount import BulkDiscount
 from discount_strategy import DiscountStrategy
 from no_discount import NoDiscount
@@ -22,6 +18,7 @@ def print_menu() -> None:
     print("5. Save Inventory")
     print("6. Exit")
     print("7. Create Order and Apply Discount")
+    print("8. Load Products from CSV")
     print("----------------------------")
 
 
@@ -44,121 +41,6 @@ def read_number(prompt: str, number_type: type[int] | type[float] = float) -> in
                 return value
         except ValueError:
             print(f"Invalid input. Please enter a valid {number_type.__name__}.")
-
-
-def ui_add_product(inventory: Inventory) -> None:
-    """Interactive UI flow to add any registered product to the inventory polymorphically."""
-    print("\nAdd New Product")
-
-    # Dynamically fetch available product types from our registry (e.g., physical, digital, subscription)
-    valid_types = list(Product._registry.keys())
-    type_prompt = f"Product Type ({'/'.join(valid_types)}) (or 'q' to go back): "
-
-    while True:
-        product_type = input(type_prompt).strip().lower()
-        if product_type == "q":
-            return
-        elif product_type in valid_types:
-            break
-        print(f"\nInvalid product type. Please enter one of: {', '.join(valid_types)}.\n")
-
-    while True:
-        product_id = input("Product ID (or 'q' to go back): ").strip()
-        if product_id.lower() == 'q':
-            return
-        elif inventory.find_product(product_id) is not None:
-            print("\nProduct ID already exists.\n")
-        elif product_id != "":
-            break
-
-    while True:
-        name = input("Product name (or 'q' to go back): ").strip()
-        if name.lower() == 'q':
-            return
-        elif name != "":
-            break
-
-    price = get_positive_float("Price: ")
-    stock = read_number("Stock Quantity: ", int)
-
-    supplier_id = input("Supplier ID: ").strip()
-    supplier: Supplier | None = None
-    for existing_product in inventory.get_all_products():
-        existing_supplier = existing_product.get_supplier()
-        if existing_supplier.get_supplier_id() == supplier_id:
-            supplier = existing_supplier
-            break
-    if supplier is None:
-        supplier_name = input("Supplier name: ").strip()
-        supplier_email = input("Supplier contact email: ").strip()
-        if not all((supplier_id, supplier_name, supplier_email)):
-            print("Supplier details cannot be empty.")
-            return
-        try:
-            supplier = Supplier(supplier_id, supplier_name, supplier_email)
-        except ValueError as error:
-            print(f"\nFailed to add supplier: {error}")
-            return
-
-    try:
-        weight: float | None = None
-        download_size: float | None = None
-        billing_cycle: str | None = None
-        if product_type == "physical":
-            weight = read_number("Weight (kg): ", float)
-        elif product_type == "digital":
-            download_size = read_number("Download Size (MB): ", float)
-        elif product_type == "subscription":
-            billing_cycle = input("Billing Cycle (e.g., Monthly/Yearly): ").strip()
-        product = ProductFactory.create(
-            product_type, product_id, name, price, stock, supplier,
-            weight=weight, download_size=download_size, billing_cycle=billing_cycle,
-        )
-        inventory.add_product(product)
-    except ValueError as error:
-        print(f"\nFailed to add product: {error}")
-    else:
-        print("\nProduct added successfully!")
-
-
-def ui_update_stock(inventory: Inventory) -> None:
-    """Interactive UI flow to update product stock."""
-    print("\nUpdate Stock")
-    while True:
-        product_id = input("Enter Product ID (or 'q' to go back): ").strip()
-        if product_id.lower() == "q":
-            return
-        product = inventory.find_product(product_id)
-        if product is not None:
-            break
-        print("\nProduct not found.\n")
-
-    print(f"\nProduct Found: {product.get_name()} (Current Stock: {product.get_stock()})")
-    product.get_supplier().display_information()
-    new_stock = read_number("\nNew Stock Quantity: ", int)
-    try:
-        inventory.update_stock(product_id, int(new_stock))
-    except (KeyError, ValueError) as error:
-        print(f"\nStock update failed: {error}")
-    else:
-        print("\nStock updated successfully!")
-
-
-def ui_search_product(inventory: Inventory) -> None:
-    """Interactive UI flow to search and display a product."""
-    print("\nSearch Product")
-    while True:
-        product_id = input("Enter Product ID (or 'q' to go back): ").strip()
-        if product_id.lower() == "q":
-            return
-        product = inventory.find_product(product_id)
-        if product is not None:
-            break
-        print("\nProduct not found.\n")
-
-    print("\n" + "-" * 48)
-    print(product.display_information())
-    print("-" * 48)
 
 
 def ui_order_discount(order: Order) -> None:

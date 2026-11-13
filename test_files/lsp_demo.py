@@ -10,14 +10,8 @@ def main() -> None:
     )
 
     products: list[Product] = [
-        ProductFactory.create(
-            "physical", "P001", "Book", 10.0, 5, supplier,
-            weight=0.5,
-        ),
-        ProductFactory.create(
-            "digital", "D001", "Ebook", 5.0, 10, supplier,
-            download_size=2.0,
-        ),
+        ProductFactory.create('physical', 'P001', 'Book', 10.0, 5, 0.5, supplier),
+        ProductFactory.create('digital', 'D001', 'Ebook', 5.0, 10, 2.0, supplier),
     ]
 
     for product in products:

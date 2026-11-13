@@ -6,19 +6,19 @@ from no_discount import NoDiscount
 class Order:
     """Represents an order containing products and their quantities."""
     
-    def __init__(self, order_id: str, discount_strategy: DiscountStrategy | None = None) -> None:
+    def __init__(self, order_id: str, discount: DiscountStrategy = NoDiscount()) -> None:
         if not isinstance(order_id, str) or not order_id.strip():
             raise ValueError("Order ID cannot be empty.")
         self.__order_id: str = order_id
-        self.__discount_strategy: DiscountStrategy = (NoDiscount() if discount_strategy is None else discount_strategy)
+        self.__discount: DiscountStrategy = discount
         self.__order_lines: list[OrderLine] = []  # List to hold OrderLine instances
 
     def get_order_id(self) -> str:
         return self.__order_id
 
-    def set_discount(self, discount_strategy: DiscountStrategy) -> None:
+    def set_discount(self, discount: DiscountStrategy) -> None:
         """Set the discount strategy for the order."""
-        self.__discount_strategy = discount_strategy
+        self.__discount = discount
     
     def add_order_line(self, product: Product, quantity: int) -> None:
         """Add a product and its quantity to the order."""
@@ -29,15 +29,15 @@ class Order:
         """Remove a line by index. Raise IndexError if out of bounds."""
         del self.__order_lines[index]
 
-    def get_order_lines(self) -> list[tuple[Product, int, float]]:
-        return [
+    def get_order_lines(self) -> tuple[tuple[Product, int, float], ...]:
+        return tuple(
         (line.get_product(),
          line.get_quantity(),
          line.calculate_subtotal())
         for line in self.__order_lines
-        ]
+        )
 
     def calculate_total(self) -> float:
         """Calculate the total price for the entire order."""
         total = sum(line.calculate_subtotal() for line in self.__order_lines)
-        return self.__discount_strategy.apply(total)
+        return self.__discount.apply(total)

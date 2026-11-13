@@ -13,24 +13,21 @@ class ProductFactory:
         product_id: str,
         name: str,
         price: float,
-        stock_quantity: int,
+        stock: int,
+        extra_value: float,
         supplier: Supplier,
-        *,
-        weight: float | None = None,
-        download_size: float | None = None,
-        billing_cycle: str | None = None,
     ) -> Product:
         if product_type == "physical":
-            if weight is None:
-                raise ValueError("Physical products require a weight.")
-            return PhysicalProduct(product_id, name, price, stock_quantity, weight, supplier)
+            return PhysicalProduct(product_id, name, price, stock, extra_value, supplier)
         if product_type == "digital":
-            if download_size is None:
-                raise ValueError("Digital products require a download size.")
-            return DigitalProduct(product_id, name, price, stock_quantity, download_size, supplier)
-        if product_type == "subscription":
-            if billing_cycle is None:
-                raise ValueError("Subscription products require a billing cycle.")
-            return SubscriptionProduct(product_id, name, price, stock_quantity, billing_cycle, supplier)
+            return DigitalProduct(product_id, name, price, stock, extra_value, supplier)
         else:
             raise ValueError(f"Unknown product type: {product_type}")
+
+    @staticmethod
+    def create_subscription(
+        product_id: str, name: str, price: float, stock: int,
+        billing_cycle: str, supplier: Supplier,
+    ) -> Product:
+        """Keep the existing subscription extension outside the UML create interface."""
+        return SubscriptionProduct(product_id, name, price, stock, billing_cycle, supplier)

@@ -15,11 +15,11 @@ class InvalidValuesTests(unittest.TestCase):
             for price, stock in [(0.0, 0), (-1.0, 0), (float("nan"), 0), (float("inf"), 0), (10.0, -1), (10.0, 1.5)]:
                 with self.subTest(kind=kind, price=price, stock=stock):
                     with self.assertRaises(ValueError):
-                        ProductFactory.create(kind, "P1", "Item", price, stock, self.supplier, weight=0.5, download_size=2.0)
+                        ProductFactory.create(kind, 'P1', 'Item', price, stock, 0.5 if kind == 'physical' else 2.0, self.supplier)
 
     def test_stock_updates_preserve_last_valid_value(self) -> None:
         for kind in ("physical", "digital"):
-            product = ProductFactory.create(kind, "P1", "Item", 10.0, 5, self.supplier, weight=0.5, download_size=2.0)
+            product = ProductFactory.create(kind, 'P1', 'Item', 10.0, 5, 0.5 if kind == 'physical' else 2.0, self.supplier)
             for invalid in (-1, 1.5):
                 with self.subTest(kind=kind, stock=invalid):
                     with self.assertRaises(ValueError):
@@ -29,7 +29,7 @@ class InvalidValuesTests(unittest.TestCase):
             self.assertEqual(product.get_stock(), 0)
 
     def test_invalid_line_does_not_change_order(self) -> None:
-        product = ProductFactory.create("physical", "P1", "Book", 10.0, 0, self.supplier, weight=0.5)
+        product = ProductFactory.create('physical', 'P1', 'Book', 10.0, 0, 0.5, self.supplier)
         order = Order("O1")
         order.add_order_line(product, 1)
         for quantity in (0, -1, 1.5):
@@ -38,7 +38,7 @@ class InvalidValuesTests(unittest.TestCase):
                     OrderLine(product, quantity)
                 with self.assertRaises(ValueError):
                     order.add_order_line(product, quantity)
-                self.assertEqual(order.get_order_lines(), [(product, 1, 10.0)])
+                self.assertEqual(order.get_order_lines(), ((product, 1, 10.0),))
 
 
 if __name__ == "__main__":

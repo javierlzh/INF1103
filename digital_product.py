@@ -40,10 +40,7 @@ class DigitalProduct(Product):
 
         if "download_size" not in item:
             raise ValueError("Digital product requires download size.")
-        return cast(DigitalProduct, ProductFactory.create(
-            "digital", item["id"], item["name"], item["price"], item["stock"],
-            supplier, download_size=item["download_size"],
-        ))
+        return cast(DigitalProduct, ProductFactory.create('digital', item['id'], item['name'], item['price'], item['stock'], item['download_size'], supplier))
 
     @classmethod
     def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: ReadNumber, supplier: Supplier) -> 'DigitalProduct':
@@ -51,7 +48,4 @@ class DigitalProduct(Product):
         from product_factory import ProductFactory
 
         download_size = read_number_func("Download Size (MB): ", float)
-        return cast(DigitalProduct, ProductFactory.create(
-            "digital", product_id, name, price, stock, supplier,
-            download_size=download_size,
-        ))
+        return cast(DigitalProduct, ProductFactory.create('digital', product_id, name, price, stock, download_size, supplier))

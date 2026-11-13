@@ -44,10 +44,25 @@ class Product(ABC):
                 supplier = suppliers[supplier_id]
             else:
                 suppliers[supplier_id] = supplier
+        extra_value: float = 0.0
+        if product_type == "physical":
+            if "weight" not in item:
+                raise ValueError("Physical product requires weight.")
+            extra_value = item["weight"]
+        elif product_type == "digital":
+            if "download_size" not in item:
+                raise ValueError("Digital product requires download size.")
+            extra_value = item["download_size"]
+        if product_type == "subscription":
+            if "billing_cycle" not in item:
+                raise ValueError("Subscription products require a billing cycle.")
+            return ProductFactory.create_subscription(
+                item["id"], item["name"], item["price"], item["stock"],
+                item["billing_cycle"], supplier,
+            )
         return ProductFactory.create(
             product_type, item["id"], item["name"], item["price"], item["stock"],
-            supplier, weight=item.get("weight"), download_size=item.get("download_size"),
-            billing_cycle=item.get("billing_cycle"),
+            extra_value, supplier,
         )
 
     def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier) -> None:

@@ -76,5 +76,18 @@
         },
         "type": "physical",
         "weight": 2.0
+    },
+    {
+        "id": "D001",
+        "name": "Photo Editor",
+        "price": 49.9,
+        "stock": 100,
+        "supplier": {
+            "supplier_id": "S001",
+            "name": "ABC Supplies",
+            "contact_email": "abc@example.com"
+        },
+        "type": "digital",
+        "download_size": 0.0
     }
 ]

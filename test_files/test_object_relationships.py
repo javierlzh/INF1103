@@ -13,15 +13,9 @@ class ObjectRelationshipTests(unittest.TestCase):
             "S001", "ABC Supplies", "abc@example.com"
         )
 
-        self.physical: Product = ProductFactory.create(
-            "physical", "P001", "Book", 10.0, 5, self.supplier,
-            weight=0.5,
-        )
+        self.physical: Product = ProductFactory.create('physical', 'P001', 'Book', 10.0, 5, 0.5, self.supplier)
 
-        self.digital: Product = ProductFactory.create(
-            "digital", "D001", "Ebook", 4.0, 10, self.supplier,
-            download_size=2.0,
-        )
+        self.digital: Product = ProductFactory.create('digital', 'D001', 'Ebook', 4.0, 10, 2.0, self.supplier)
 
     def test_association_products_share_an_independent_supplier(self) -> None:
         self.assertIs(self.physical.get_supplier(), self.supplier)
@@ -49,9 +43,9 @@ class ObjectRelationshipTests(unittest.TestCase):
         order_a = Order("O001")
         order_a.add_order_line(self.physical, 2)
         order_a.add_order_line(self.digital, 3)
-        self.assertEqual(order_a.get_order_lines(), [
+        self.assertEqual(order_a.get_order_lines(), (
             (self.physical, 2, 20.0), (self.digital, 3, 12.0)
-        ])
+        ))
         self.assertAlmostEqual(order_a.calculate_total(), 32.0)
         for product, quantity, subtotal in order_a.get_order_lines():
             print(f"{product.get_name()} x {quantity}: ${subtotal:.2f}")
