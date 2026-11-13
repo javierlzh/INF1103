@@ -1,5 +1,10 @@
 INF1103 Lab 9 Predict First Notes
 
+Draft predictions were prepared after the implementation existed. Review
+them so they reflect your own expectations before your original tests.
+Actual results below were verified against the current code. Questions 1
+and 5 also include source/history review and design reasoning.
+
 1. Section 2.1 The Problem
 Question: The business now wants a 5% student discount. 
 Without the Strategy pattern, which class and method must 
@@ -7,10 +12,17 @@ change? After you complete Section 2, answer the same question
 again for your Strategy version.
 
 Prediction:
-
+Without Strategy, I expect Order.calculate_total() to need another discount
+branch. With Strategy, I expect the 5% calculation to belong in
+StudentDiscount.apply(), and Order to keep delegating to its strategy.
 
 Actual result:
-
+Reviewing Order.calculate_total() confirmed that it delegates to
+self.__discount_strategy.apply(total). StudentDiscount.apply() now returns
+total * 0.95, applying the requested 5% student discount. On 250 it returns
+237.50. Changing the student rate requires changing that strategy, while
+Order.calculate_total() continues to delegate to the strategy.
+The pre-Strategy answer describes the original design problem.
 
 2. Section 2.3 User a strategy in Order
 Question: Create an order whose lines add up to 250. What will 
@@ -19,10 +31,17 @@ then call set_discount(Percentage(10)) on the same order? Write
 both answers down, then run your code and check.
 
 Prediction:
-
+Reading 200 as an order-value threshold, I would expect 250 - 20 = 230.
+After switching the same order to a 10% percentage discount, I expect 225.
 
 Actual result:
-
+I created one product priced at 50 and added five units to an order, giving
+an order subtotal of 250. With BulkDiscount(200, 20), calculate_total()
+returned 230. Calling set_discount(PercentageDiscount(10)) on that same
+order then returned 225.0. BulkDiscount compares the order subtotal with
+its monetary threshold, including equality: a total of 200 becomes 180,
+while 199.99 stays unchanged. PercentageDiscount is the class name in this
+project.
 
 3. Section 2.4 Extend without modifying
 Question:  Look back at Lab 8. Which relationship best 
@@ -33,10 +52,19 @@ PercentageDiscount object? Write your answer and a multiplicity
 for each end, then check it against your code. 
 
 Prediction:
-
+I expect association because Order uses a discount algorithm. Two orders
+should be able to reference the same PercentageDiscount object. Each Order
+uses exactly 1 DiscountStrategy, and each strategy can be used by 0..* Orders.
 
 Actual result:
-
+Two Orders were created with the same PercentageDiscount(10) object.
+Their stored strategy references were identical when compared using is.
+Orders with subtotals of 100 and 200 returned 90 and 180 respectively.
+Replacing the first order's strategy with PercentageDiscount(5) changed its
+total to 95 while the second order still returned 180.
+The relationship is association. The multiplicity at the DiscountStrategy end
+is 1 and at the Order end is 0..*. Omitting a constructor strategy creates a
+NoDiscount object, so every constructed order still has a strategy.
 
 4. Section 3.2 Create a ProductEntry
 Question: What happens if you call 
@@ -45,10 +73,18 @@ exception, and what happens to your program if nothing catches
 it? Run it and check.  
 
 Prediction:
-
+I expect the factory to reach its unknown-type branch and raise ValueError.
+If there is no matching exception handler, the program should print a
+traceback and stop.
 
 Actual result:
-
+I ran ProductFactory.create("service", ...) in a separate Python process.
+The final else branch in product_factory.py raised this exception:
+ValueError: Unknown product type: service
+The failing line was:
+raise ValueError(f"Unknown product type: {product_type}")
+The process printed a traceback and exited with status 1. Product creation
+failed and execution did not continue past that call.
 
 5. Section 3.3 Who knows about what?
 Question: Suppose a new BundleProduct type is added. How many 
@@ -58,10 +94,29 @@ factory still breaks OCP and why that is acceptable here.
  
 
 Prediction:
-
+I expect the factory to concentrate the constructor-selection changes in
+ProductFactory.create(). Before the factory, extending several separate
+creation callers would require editing each caller. The new BundleProduct
+class, input fields and loading format may also need implementation.
 
 Actual result:
-
+I checked Git commit bac1222, immediately before the factory commit.
+It contains 6 explicit physical/digital constructor calls across 3 caller
+files: 2 in lsp_demo.py, 2 in polymorphism_demo.py, and 2 in the relationship
+test setup. Extending all of those example callers to offer a third type
+would distribute the creation edits across those 3 files.
+In the current design, constructor selection is centralized in 1 existing
+method, ProductFactory.create(). Existing callers can request a product type
+through that method.
+For full BundleProduct support in the current menu and JSON loader, at least
+3 existing files need review: product_factory.py for construction, ui.py for
+Bundle-specific input, and persistence.py for required record fields.
+New record fields would also require updating product_data.py. The new class
+and its tests are additional work in either design.
+The factory still needs a new branch when a product type is added, so it is
+not fully closed to modification under OCP. This simple factory is acceptable
+for the lab because construction decisions have a clear central location and
+the example has a small set of known product types.
 
 6. Section 4 Add validation
 Question: Think back to the Lab 8 LSP discussion. If Product 
@@ -70,10 +125,17 @@ be allowed to skip or change that rule? Why?
  
 
 Prediction:
-
+I expect DigitalProduct to preserve Product's nonnegative-stock rule.
+Accepting negative stock in a subclass would break the contract relied on
+by code using Product references and would violate LSP.
 
 Actual result:
-
+I created a physical product and a digital product, each with stock 5,
+then called update_stock(-1) on each. Both raised:
+ValueError: Stock cannot be negative.
+Both still had stock 5 after rejection. Both subclasses inherit the same
+Product.update_stock() validation and call the parent constructor for initial
+stock validation. A subclass must preserve this contract to satisfy LSP.
 
 7. Section 5.1 User input
 Question: A user enters abc, then -5, then 12.50. Write down 
@@ -82,10 +144,18 @@ Then run it and check.
  
 
 Prediction:
-
+For abc, I expect a conversion-error message and another prompt.
+For -5, I expect the positive-value validation message and another prompt.
+For 12.50, I expect the helper to return the float 12.5.
 
 Actual result:
-
+I called get_positive_float("Price: ") with the inputs in the question.
+After abc, it printed:
+Please enter a valid number, e.g. 12.50
+After -5, it printed:
+Please enter a number greater than zero.
+After 12.50, it returned 12.5 without printing an error. The prompt was
+requested three times. 12.50 and 12.5 represent the same float value.
 
 8. Section 5.2 Loading products from a file
 Question: Before running, write down how many products will 
@@ -95,6 +165,29 @@ finally will run?
  
 
 Prediction:
-
+I expect 3 products to load into an empty inventory. The service row
+should report an unknown type, and the Office Chair row should report its
+invalid price. Then I expect the loaded count and final message.
+After renaming the file, I expect FileNotFoundError to be caught, else to be
+skipped, and finally to print the finishing message.
 
 Actual result:
+With the supplied products.csv and an empty Inventory, the exact messages
+were printed in this order:
+Skipping row 4: Unknown product type: service
+Skipping row 5: could not convert string to float: 'abc'
+3 products loaded.
+Load attempt finished.
+Desk Lamp (P001), Photo Editor (D001), and Monitor Stand (P003) loaded.
+The outer else block ran. Each invalid row was caught by its own inner
+except ValueError, and subsequent rows continued to load. finally ran last.
+I then renamed a temporary copy of the CSV and tried its original path.
+The missing-file message included that original path, followed by:
+Load attempt finished.
+For a run using the relative path products.csv, the missing-file messages are:
+Products file not found: products.csv
+Load attempt finished.
+The outer except FileNotFoundError and finally blocks run in this case.
+The else block is skipped, so no loaded-count message is printed.
+The loader supplies 0.0 placeholders for weight and download size because
+the supplied CSV omits those fields.

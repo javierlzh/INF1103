@@ -1,4 +1,5 @@
 from math import isfinite
+from typing import cast
 
 from product import Product
 from product_data import ProductData
@@ -37,14 +38,20 @@ class PhysicalProduct(Product, CanBeShipped):
 
     @classmethod
     def from_dict(cls, item: ProductData, supplier: Supplier) -> 'PhysicalProduct':
+        from product_factory import ProductFactory
+
         if "weight" not in item:
             raise ValueError("Physical product requires weight.")
-        return cls(
-            item["id"], item["name"], item["price"],
-            item["stock"], item["weight"], supplier
-        )
+        return cast(PhysicalProduct, ProductFactory.create(
+            "physical", item["id"], item["name"], item["price"], item["stock"],
+            supplier, weight=item["weight"],
+        ))
 
     @classmethod
     def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: ReadNumber, supplier: Supplier) -> 'PhysicalProduct':
+        from product_factory import ProductFactory
+
         weight = read_number_func("Weight (kg): ", float)
-        return cls(product_id, name, price, stock, weight, supplier)
+        return cast(PhysicalProduct, ProductFactory.create(
+            "physical", product_id, name, price, stock, supplier, weight=weight,
+        ))

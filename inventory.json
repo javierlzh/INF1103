@@ -63,5 +63,18 @@
         },
         "type": "subscription",
         "billing_cycle": "Monthly"
+    },
+    {
+        "id": "P006",
+        "name": "Phone",
+        "price": 1900.99,
+        "stock": 3,
+        "supplier": {
+            "supplier_id": "S001",
+            "name": "ABC Supplies",
+            "contact_email": "abc@example.com"
+        },
+        "type": "physical",
+        "weight": 2.0
     }
 ]

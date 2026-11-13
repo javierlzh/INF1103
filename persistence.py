@@ -66,7 +66,7 @@ def load_inventory() -> tuple[Inventory, str]:
     except FileNotFoundError:
         status = "not_found"
     except (OSError, ValueError) as e:
-        print(f"DEBUG ERROR: {e}")
+        print(f"Could not load inventory: {e}")
         inventory = Inventory()
         status = "error"
     return inventory, status

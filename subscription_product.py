@@ -1,3 +1,5 @@
+from typing import cast
+
 from product import Product
 from product_data import ProductData
 from read_number import ReadNumber
@@ -31,14 +33,21 @@ class SubscriptionProduct(Product):
 
     @classmethod
     def from_dict(cls, item: ProductData, supplier: Supplier) -> 'SubscriptionProduct':
+        from product_factory import ProductFactory
+
         if "billing_cycle" not in item:
             raise ValueError("Subscription product requires billing cycle.")
-        return cls(
-            item["id"], item["name"], item["price"],
-            item["stock"], item["billing_cycle"], supplier
-        )
+        return cast(SubscriptionProduct, ProductFactory.create(
+            "subscription", item["id"], item["name"], item["price"], item["stock"],
+            supplier, billing_cycle=item["billing_cycle"],
+        ))
 
     @classmethod
     def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: ReadNumber, supplier: Supplier) -> 'SubscriptionProduct':
+        from product_factory import ProductFactory
+
         billing_cycle = input("Billing Cycle (e.g., Monthly/Yearly): ").strip()
-        return cls(product_id, name, price, stock, billing_cycle, supplier)
+        return cast(SubscriptionProduct, ProductFactory.create(
+            "subscription", product_id, name, price, stock, supplier,
+            billing_cycle=billing_cycle,
+        ))

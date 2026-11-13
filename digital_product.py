@@ -1,4 +1,5 @@
 from math import isfinite
+from typing import cast
 
 from product import Product
 from product_data import ProductData
@@ -35,15 +36,22 @@ class DigitalProduct(Product):
     @classmethod
     def from_dict(cls, item: ProductData, supplier: Supplier) -> 'DigitalProduct':
         """Instantiate a DigitalProduct from a dictionary."""
+        from product_factory import ProductFactory
+
         if "download_size" not in item:
             raise ValueError("Digital product requires download size.")
-        return cls(
-            item["id"], item["name"], item["price"],
-            item["stock"], item["download_size"], supplier
-        )
+        return cast(DigitalProduct, ProductFactory.create(
+            "digital", item["id"], item["name"], item["price"], item["stock"],
+            supplier, download_size=item["download_size"],
+        ))
 
     @classmethod
     def get_ui_inputs(cls, product_id: str, name: str, price: float, stock: int, read_number_func: ReadNumber, supplier: Supplier) -> 'DigitalProduct':
         """Prompt user for digital-specific inputs and return a DigitalProduct instance."""
+        from product_factory import ProductFactory
+
         download_size = read_number_func("Download Size (MB): ", float)
-        return cls(product_id, name, price, stock, download_size, supplier)
+        return cast(DigitalProduct, ProductFactory.create(
+            "digital", product_id, name, price, stock, supplier,
+            download_size=download_size,
+        ))

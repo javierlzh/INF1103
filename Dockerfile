@@ -2,6 +2,6 @@ FROM python:3.11-slim
 
 WORKDIR /usr/src/app
 
-COPY .. 
+COPY . .
 
 CMD ["python", "main.py"]

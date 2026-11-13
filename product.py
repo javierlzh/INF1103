@@ -25,7 +25,10 @@ class Product(ABC):
 
     @classmethod
     def create_from_dict(cls, item: ProductData, suppliers: dict[str, Supplier] | None = None) -> 'Product':
-        """Polymorphic factory: instantiates the correct subclass from a dict."""
+        """Resolve the supplier and delegate product creation to ProductFactory."""
+        # Import at call time because ProductFactory imports the product classes.
+        from product_factory import ProductFactory
+
         product_type = item.get("type")
         if product_type is None or product_type not in cls._registry:
             raise ValueError(f"Unknown product type: {product_type}")
@@ -41,7 +44,11 @@ class Product(ABC):
                 supplier = suppliers[supplier_id]
             else:
                 suppliers[supplier_id] = supplier
-        return cls._registry[product_type].from_dict(item, supplier)
+        return ProductFactory.create(
+            product_type, item["id"], item["name"], item["price"], item["stock"],
+            supplier, weight=item.get("weight"), download_size=item.get("download_size"),
+            billing_cycle=item.get("billing_cycle"),
+        )
 
     def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier) -> None:
         if not isinstance(product_id, str) or not product_id.strip():

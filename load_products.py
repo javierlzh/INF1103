@@ -23,7 +23,7 @@ def load_products(path: str, inventory: Inventory, supplier: Supplier) -> None:
                     product_type, product_id, name, price, stock_quantity = (
                         value.strip() for value in row
                     )
-                    product = ProductFactory.create_product(
+                    product = ProductFactory.create(
                         product_type,
                         product_id,
                         name,

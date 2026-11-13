@@ -1,5 +1,5 @@
 from persistence import load_inventory, save_inventory, INVENTORY_FILE
-from ui import print_menu, ui_add_product, ui_update_stock, ui_search_product
+from ui import print_menu, ui_add_product, ui_update_stock, ui_search_product, ui_create_order
 
 
 def main() -> None:
@@ -10,14 +10,23 @@ def main() -> None:
     print("=" * 44)
     
     inventory, status = load_inventory()
+    while status == "error":
+        print(f"\nCould not load {INVENTORY_FILE}.")
+        print("Correct the file and retry, or exit to preserve the saved data.")
+        recovery = input("Enter 'r' to retry or 'q' to exit: ").strip().lower()
+        if recovery == "r":
+            inventory, status = load_inventory()
+        elif recovery == "q":
+            print("Exited. The inventory file was preserved.")
+            return
+        else:
+            print("Please enter 'r' or 'q'.")
     if status == "loaded":
         print(f"\n{INVENTORY_FILE} found. Inventory loaded successfully.")
     elif status == "not_found":
         print(f"\n{INVENTORY_FILE} not found. Starting with empty inventory.")
     elif status == "duplicates":
         print(f"\n{INVENTORY_FILE} found. Duplicate product IDs were skipped.")
-    else:
-        print(f"\nError reading {INVENTORY_FILE}. Starting with empty inventory.")
     
     print_menu()
     while not exit_program:
@@ -37,11 +46,15 @@ def main() -> None:
             else:
                 print("\nFailed to save inventory.")
         elif option == "6":
-            save_inventory(inventory)
-            print("\nThank you for using Inventory Management System. Terminated.")
-            exit_program = True
+            if save_inventory(inventory):
+                print("\nThank you for using Inventory Management System. Terminated.")
+                exit_program = True
+            else:
+                print("\nFailed to save inventory. Please try saving again before exiting.")
+        elif option == "7":
+            ui_create_order(inventory)
         else:
-            print("\nInvalid option. Please enter 1-6.")
+            print("\nInvalid option. Please enter 1-7.")
 
 
 if __name__ == "__main__":
