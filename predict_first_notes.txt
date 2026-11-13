@@ -1,81 +1,40 @@
-INF1103 Lab 8 Predict First Notes
+INF1103 Lab 9 Predict First Notes
 
-1. Section 2.2 Association
-Question: If the supplier variable is deleted after creating the products,
-can each Product still display its supplier information?
-
-Prediction:
-I expect both products to retain access to the supplier. Deleting the supplier
-variable removes that name, but each product still holds a reference to the
-same Supplier object.
-
-Actual result:
-After del supplier, both the PhysicalProduct and DigitalProduct could call
-get_supplier().display_information(). Both printed:
-Supplier ID: S001 | Name: ABC Supplies | Contact Email: abc@example.com
-The Supplier object remained alive through the products' references.
-
-2. Section 3.2 Aggregation
-Question: Will a Product still work after it is removed from Inventory A, and why?
+1. Section 2.1 The Problem
+Question: The business now wants a 5% student discount. 
+Without the Strategy pattern, which class and method must 
+change? After you complete Section 2, answer the same question 
+again for your Strategy version.
 
 Prediction:
-I expect the product to remain usable because Inventory A only stores a
-reference to it. My separate product variable still refers to the object.
-I should be able to add that same object to Inventory B.
+
 
 Actual result:
-After remove_product("P001"), Inventory A could no longer find the product.
-The product still returned its name and price. After adding it to Inventory B,
-inventory_b.find_product("P001") is product evaluated to True.
-The object was transferred without being copied or destroyed.
 
-3. Section 4.3 Composition
-Question: If the same Product is added once to each of two Orders, how many
-OrderLine objects and Product objects exist for those additions?
+
+2. Section 2.3 User a strategy in Order
+Question: Create an order whose lines add up to 250. What will 
+calculate_total() return with BulkDiscount(200,20)? What if you 
+then call set_discount(Percentage(10)) on the same order? Write 
+both answers down, then run your code and check.
 
 Prediction:
-I expect two OrderLine objects and one shared Product object. Each Order creates
-its own line, and both lines refer to the product supplied to add_order_line().
+
 
 Actual result:
-The first order's line and the second order's line were different objects:
-line_a is line_b evaluated to False.
-Their product references pointed to the same object:
-line_a.get_product() is line_b.get_product() evaluated to True.
-There were two lines for the one shared product. This count excludes unrelated
-products or lines created elsewhere in the test scenario.
 
-4. Section 7.2 Polymorphism
-Question: What will each product print for get_fulfilment_info()?
+
+3. Section 2.4 Extend without modifying
+Question:  Look back at Lab 8. Which relationship best 
+describes Order and DiscountStrategy: association, aggregation 
+or composition? Hint: is a discount part of an order, or 
+something the order uses? Could two orders share the same 
+PercentageDiscount object? Write your answer and a multiplicity
+for each end, then check it against your code. 
 
 Prediction:
-For the Book physical product with weight 0.5 kg, I expect shipping information
-and the weight. For the Ebook digital product with download size 2.0 MB, I expect
-download information stating that shipping is not required.
+
 
 Actual result:
-Physical product. Shipping required. Weight: 0.5kg
-Digital product. No shipping required. Download Size: 2.0MB
 
-Both calls were also verified using one loop over Inventory.get_all_products()
-after adding the physical and digital products to the same Inventory. No
-subclass checks were needed to select their fulfilment behavior.
 
-5. Section 7.3 Connecting Polymorphism to LSP
-
-The show_product_details(product: Product) function demonstrates polymorphism
-because the same function accepts both PhysicalProduct and DigitalProduct.
-It calls display_information() and get_fulfilment_info() through the Product
-interface, and Python selects the implementation belonging to the actual object.
-Physical products display weight and shipping information, while digital
-products display download size and explain that shipping is not required.
-The function does not need separate branches or subclass checks.
-
-LSP supports this design because both subclasses preserve the behavior promised
-by Product. They return strings from the display and fulfilment methods and
-support the same stock-update contract: a valid quantity sets stock and returns
-None, while a negative quantity raises ValueError without changing stock.
-Therefore, either subclass can replace a Product reference without requiring
-changes to the calling function. Polymorphism supplies the different
-implementations; LSP ensures those implementations remain compatible with
-the expectations of code using Product.
