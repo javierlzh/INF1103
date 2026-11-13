@@ -3,6 +3,7 @@ from typing import overload
 from product import Product
 from inventory import Inventory
 from supplier import Supplier
+from get_positive_float import get_positive_float
 
 def print_menu() -> None:
     """Display the main application menu."""
@@ -69,7 +70,7 @@ def ui_add_product(inventory: Inventory) -> None:
         elif name != "":
             break
 
-    price = read_number("Price: ", float)
+    price = get_positive_float("Price: ")
     stock = read_number("Stock Quantity: ", int)
 
     supplier_id = input("Supplier ID: ").strip()
