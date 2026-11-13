@@ -85,12 +85,16 @@ def ui_add_product(inventory: Inventory) -> None:
         if not all((supplier_id, supplier_name, supplier_email)):
             print("Supplier details cannot be empty.")
             return
-        supplier = Supplier(supplier_id, supplier_name, supplier_email)
+        try:
+            supplier = Supplier(supplier_id, supplier_name, supplier_email)
+        except ValueError as error:
+            print(f"\nFailed to add supplier: {error}")
+            return
 
     product_class = Product._registry[product_type]
-    product = product_class.get_ui_inputs(product_id, name, price, stock, read_number, supplier)
 
     try:
+        product = product_class.get_ui_inputs(product_id, name, price, stock, read_number, supplier)
         inventory.add_product(product)
     except ValueError as error:
         print(f"\nFailed to add product: {error}")

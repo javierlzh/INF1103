@@ -7,6 +7,8 @@ class Order:
     """Represents an order containing products and their quantities."""
     
     def __init__(self, order_id: str, discount_strategy: DiscountStrategy | None = None) -> None:
+        if not isinstance(order_id, str) or not order_id.strip():
+            raise ValueError("Order ID cannot be empty.")
         self.__order_id: str = order_id
         self.__discount_strategy: DiscountStrategy = (NoDiscount() if discount_strategy is None else discount_strategy)
         self.__order_lines: list[OrderLine] = []  # List to hold OrderLine instances

@@ -2,6 +2,7 @@ from inventory import Inventory
 from physical_product import PhysicalProduct
 from digital_product import DigitalProduct
 from supplier import Supplier
+from product_factory import ProductFactory
 
 
 def main() -> None:
@@ -10,8 +11,8 @@ def main() -> None:
     )
 
     inventory = Inventory()
-    inventory.add_product(PhysicalProduct("P001", "Book", 10.0, 5, 0.5, supplier))
-    inventory.add_product(DigitalProduct("D001", "Ebook", 5.0, 10, 2.0, supplier))
+    inventory.add_product(ProductFactory.create_product("physical", "P001", "Book", 10.0, 5, supplier, weight=0.5))
+    inventory.add_product(ProductFactory.create_product("digital", "D001", "Ebook", 5.0, 10, supplier, download_size=2.0))
 
     for product in inventory.get_all_products():
         print(product.display_information())

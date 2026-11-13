@@ -15,6 +15,12 @@ def is_supplier_data(value: object) -> TypeGuard[SupplierData]:
 
 class Supplier:
     def __init__(self, supplier_id: str, name: str, contact_email: str) -> None:
+        if not isinstance(supplier_id, str) or not supplier_id.strip():
+            raise ValueError("Supplier ID cannot be empty.")
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError("Supplier name cannot be empty.")
+        if not isinstance(contact_email, str) or not contact_email.strip():
+            raise ValueError("Supplier contact email cannot be empty.")
         self.__supplier_id: str = supplier_id
         self.__name: str = name
         self.__contact_email: str = contact_email

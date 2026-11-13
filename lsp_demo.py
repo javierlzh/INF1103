@@ -1,6 +1,5 @@
 from product import Product
-from physical_product import PhysicalProduct
-from digital_product import DigitalProduct
+from product_factory import ProductFactory
 from supplier import Supplier
 from inventory import Inventory
 
@@ -11,8 +10,14 @@ def main() -> None:
     )
 
     products: list[Product] = [
-        PhysicalProduct("P001", "Book", 10.0, 5, 0.5, supplier),
-        DigitalProduct("D001", "Ebook", 5.0, 10, 2.0, supplier),
+        ProductFactory.create_product(
+            "physical", "P001", "Book", 10.0, 5, supplier,
+            weight=0.5,
+        ),
+        ProductFactory.create_product(
+            "digital", "D001", "Ebook", 5.0, 10, supplier,
+            download_size=2.0,
+        ),
     ]
 
     for product in products:
@@ -28,9 +33,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-# Raising NotImplementedError in DigitalProduct.update_stock() violates 
-# LSP because Product promises stock updates. Here, digital stock 
-# represents available licences, so inheriting the parent implementation is
-# appropriate. If digital products have no stock, stock management should 
-# move to a separate abstraction for products that support it.

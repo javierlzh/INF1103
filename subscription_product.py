@@ -9,6 +9,8 @@ class SubscriptionProduct(Product):
 
     def __init__(self, product_id: str, name: str, price: float, stock: int, billing_cycle: str, supplier: Supplier) -> None:
         super().__init__(product_id, name, price, stock, supplier)
+        if not isinstance(billing_cycle, str) or not billing_cycle.strip():
+            raise ValueError("Billing cycle cannot be empty.")
         self.__billing_cycle: str = billing_cycle
 
     def get_billing_cycle(self) -> str:

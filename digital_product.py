@@ -1,3 +1,5 @@
+from math import isfinite
+
 from product import Product
 from product_data import ProductData
 from read_number import ReadNumber
@@ -10,6 +12,8 @@ class DigitalProduct(Product):
 
     def __init__(self, product_id: str, name: str, price: float, stock: int, download_size: float, supplier: Supplier) -> None:
         super().__init__(product_id, name, price, stock, supplier)
+        if type(download_size) not in (int, float) or not isfinite(download_size) or download_size < 0:
+            raise ValueError("Download size must be a finite, nonnegative number.")
         self.__download_size: float = download_size
 
     def get_download_size(self) -> float:

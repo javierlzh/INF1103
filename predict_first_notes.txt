@@ -38,3 +38,63 @@ Prediction:
 Actual result:
 
 
+4. Section 3.2 Create a ProductEntry
+Question: What happens if you call 
+ProductFactory.create("service", ...)? Which line raises the
+exception, and what happens to your program if nothing catches 
+it? Run it and check.  
+
+Prediction:
+
+
+Actual result:
+
+
+5. Section 3.3 Who knows about what?
+Question: Suppose a new BundleProduct type is added. How many 
+places in your code would need to change before you added the 
+factory, and how many after? Count them, then explain why the 
+factory still breaks OCP and why that is acceptable here. 
+ 
+
+Prediction:
+
+
+Actual result:
+
+
+6. Section 4 Add validation
+Question: Think back to the Lab 8 LSP discussion. If Product 
+validates that stock cannot go negative, should DigitalProduct 
+be allowed to skip or change that rule? Why? 
+ 
+
+Prediction:
+
+
+Actual result:
+
+
+7. Section 5.1 User input
+Question: A user enters abc, then -5, then 12.50. Write down 
+exactly what prints after each entry and what value is returned.
+Then run it and check. 
+ 
+
+Prediction:
+
+
+Actual result:
+
+
+8. Section 5.2 Loading products from a file
+Question: Before running, write down how many products will 
+load, which messages will print, and in what order. Then rename 
+products.csv and predict again: which of except, else and 
+finally will run? 
+ 
+
+Prediction:
+
+
+Actual result:

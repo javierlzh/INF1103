@@ -1,3 +1,5 @@
+from math import isfinite
+
 from product import Product
 from product_data import ProductData
 from read_number import ReadNumber
@@ -10,6 +12,8 @@ class PhysicalProduct(Product, CanBeShipped):
 
     def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float, supplier: Supplier) -> None:
         super().__init__(product_id, name, price, stock, supplier)
+        if type(weight) not in (int, float) or not isfinite(weight) or weight < 0:
+            raise ValueError("Weight must be a finite, nonnegative number.")
         self.__weight: float = weight
 
     def get_weight(self) -> float:

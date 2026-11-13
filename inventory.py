@@ -32,6 +32,8 @@ class Inventory:
 
     def add_product(self, product: Product) -> None:
         """Store a product. Raise ValueError for a duplicate ID."""
+        if not isinstance(product, Product):
+            raise ValueError("Inventory requires a Product object.")
         product_id = product.get_product_id()
         if product_id in self.__products:
             raise ValueError(f"Product {product_id} already exists.")

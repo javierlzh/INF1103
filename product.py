@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from math import isfinite
 from collections.abc import Callable
 from typing import TypeVar
 
@@ -43,6 +44,18 @@ class Product(ABC):
         return cls._registry[product_type].from_dict(item, supplier)
 
     def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier) -> None:
+        if not isinstance(product_id, str) or not product_id.strip():
+            raise ValueError("Product ID cannot be empty.")
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError("Product name cannot be empty.")
+        if type(price) not in (int, float) or not isfinite(price) or price <= 0:
+            raise ValueError("Price must be greater than zero.")
+        if type(stock) is not int:
+            raise ValueError("Stock must be a whole number.")
+        if stock < 0:
+            raise ValueError("Stock cannot be negative.")
+        if not isinstance(supplier, Supplier):
+            raise ValueError("Product requires a Supplier object.")
         self.__product_id: str = product_id
         self.__name: str = name
         self.__price: float = price
@@ -85,6 +98,8 @@ class Product(ABC):
 
     def update_stock(self, quantity: int) -> None:
         """Set stock to quantity. Raise ValueError for negative stock."""
+        if type(quantity) is not int:
+            raise ValueError("Stock must be a whole number.")
         if quantity < 0:
             raise ValueError("Stock cannot be negative.")
         self.__stock = quantity
